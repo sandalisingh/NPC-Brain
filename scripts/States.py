@@ -30,3 +30,8 @@ class PersonalityIndex(Enum):
     Extraversion = 2
     Agreeableness = 3
     Neuroticism = 4
+
+class Range(Enum):
+    Low = range(0, 4)      
+    Medium = range(4, 8)   
+    High = range(8, 11)
