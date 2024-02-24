@@ -15,8 +15,7 @@ alpha = 0.1  # Learning rate
 gamma = 0.9  # Discount factor
 
 # Define reward function (example)
-def calculate_reward(current_action, next_action):
-    # Return reward !!!!!
+def calculate_reward(personality_vector, current_action, next_action):
     reward = 0
     
     # Assign rewards based on personality type and emotional state
@@ -37,22 +36,24 @@ def calculate_reward(current_action, next_action):
     
     return reward
 
-    return 0
+def action_generator(personality_vector, current_state) :
+    # Choose action based on epsilon-greedy policy
+    epsilon = 0.1  # Exploration rate
+    if np.random.rand() < epsilon:
+        final_action_state_index = np.random.randint(no_of_action_states)  # Choose random action
+    else:
+        final_action_state_index = np.argmax(Q[current_state])  # PROBABILITY MULTIPLICATION !!!!
 
-# Define current and next states
-current_state = (emotional_state_index, action_state_index)
-next_state = (next_emotional_state_index, next_action_state_index)
+    return final_action_state_index
 
-# Choose action based on epsilon-greedy policy
-epsilon = 0.1  # Exploration rate
-if np.random.rand() < epsilon:
-    final_action_state_index = np.random.randint(no_of_action_states)  # Choose random action
-else:
-    final_action_state_index = np.argmax(Q[current_state])  # PROBABILITY MULTIPLICATION !!!!
+def q_learning(personality_vector, current_state, next_state) :
+    # Define current and next states
+    # current_state = (emotional_state_index, action_state_index)
+    # next_state = (next_emotional_state_index, next_action_state_index)
 
-# Execute action and observe reward         ### DIALOGUE GENERATION !!!!!
-reward = calculate_reward(current_state[1], final_action_state_index)
+    # Execute action and observe reward         ### DIALOGUE GENERATION !!!!!
+    reward = calculate_reward(current_state[1], next_state[1])
 
-# Update Q-value using Q-learning update rule
-# for dominant personality !!!!
-Q[current_state][final_action_state_index] = (1 - alpha) * Q[current_state][final_action_state_index] + alpha * (reward + gamma * np.max(Q[next_state]))
+    # Update Q-value using Q-learning update rule
+    # for dominant personality !!!!
+    Q[current_state][final_action_state_index] = (1 - alpha) * Q[current_state][final_action_state_index] + alpha * (reward + gamma * np.max(Q[next_state]))
