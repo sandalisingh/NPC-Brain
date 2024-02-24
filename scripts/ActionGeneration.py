@@ -22,24 +22,10 @@ class ActionGenerator:
     def calculate_reward(personality_vector, current_action, next_action):
         reward = 0
         
-        # Assign rewards based on personality type and emotional state
-        if personality_type == "Extraversion":
-            if emotional_state == "Happy":
-                if action_taken in ["Interacting", "Celebrating", "Following", "Helping"]:
-                    reward += 1
-                elif action_taken == "Attacking":
-                    reward -= 1
-            elif emotional_state == "Sad":
-                if action_taken == "Resting":
-                    reward += 1
-                elif action_taken in ["Attacking", "Fleeing"]:
-                    reward -= 1
-            # Add more conditions for other emotional states and actions
-            
-        # Add rewards for other personality types
+        # favourable transitions
+        
 
-        reward /= 5
-        print("Reward = ", reward)
+        # unfavourable transitions
         
         return reward
 
