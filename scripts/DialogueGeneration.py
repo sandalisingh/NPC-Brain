@@ -1,6 +1,8 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 
+# give input text, emotion, action !!!!
+
 def generate_dialogue():
     # Load pretrained model and tokenizer
     model_name = "microsoft/DialoGPT-medium"
