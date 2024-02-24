@@ -112,14 +112,25 @@ class ActionGenerator:
 
         return final_action_state_index
 
+    def get_dominant_personality(personality_vector) :
+        dominant_personality_index = np.argmax(personality_vector)
+        print("Dominant Personality = ", dominant_personality_index)
+        return dominant_personality_index
+
     def q_learning(self, personality_vector, current_state, next_state) :
         # Define current and next states
         # current_state = (emotional_state_index, action_state_index)
         # next_state = (next_emotional_state_index, next_action_state_index)
 
-        # Execute action and observe reward         ### DIALOGUE GENERATION !!!!!
+        # Execute action and observe reward         
         reward = self.calculate_reward(current_state[1], next_state[1])
 
         # Update Q-value using Q-learning update rule
-        # for dominant personality !!!!
-        self.Q[current_state][final_action_state_index] = (1 - alpha) * self.Q[current_state][final_action_state_index] + alpha * (reward + gamma * np.max(self.Q[next_state]))
+        # for dominant personality 
+        dominant_personality_index = self.get_dominant_personality(personality_vector)
+        dominant_personality_range = (personality_vector[dominant_personality_index]/3)+1
+        
+        q_current = self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][current_state[1]][next_state[1]]
+        max_q_next = np.max(self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][next_state[1]])
+        self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][current_state[1]][next_state[1]] = \
+            (1 - alpha) * q_current + alpha * (reward + gamma * max_q_next)
