@@ -17,6 +17,26 @@ gamma = 0.9  # Discount factor
 # Define reward function (example)
 def calculate_reward(current_action, next_action):
     # Return reward !!!!!
+    reward = 0
+    
+    # Assign rewards based on personality type and emotional state
+    if personality_type == "Extraversion":
+        if emotional_state == "Happy":
+            if action_taken in ["Interacting", "Celebrating", "Following", "Helping"]:
+                reward += 1
+            elif action_taken == "Attacking":
+                reward -= 1
+        elif emotional_state == "Sad":
+            if action_taken == "Resting":
+                reward += 1
+            elif action_taken in ["Attacking", "Fleeing"]:
+                reward -= 1
+        # Add more conditions for other emotional states and actions
+        
+    # Add rewards for other personality types
+    
+    return reward
+
     return 0
 
 # Define current and next states
@@ -31,7 +51,7 @@ else:
     final_action_state_index = np.argmax(Q[current_state])  # PROBABILITY MULTIPLICATION !!!!
 
 # Execute action and observe reward         ### DIALOGUE GENERATION !!!!!
-reward = calculate_reward(emotional_state, final_action_state_index)
+reward = calculate_reward(current_state[1], final_action_state_index)
 
 # Update Q-value using Q-learning update rule
 # for dominant personality !!!!
