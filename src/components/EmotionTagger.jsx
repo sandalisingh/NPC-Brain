@@ -158,24 +158,6 @@ const EmotionTagger = () => {
     return (
         <div className='MediumText Center'> 
             <div className='Line'></div>
-            <div>
-                Initial Emotion:
-                <select value={initialEmotion} onChange={handleInitialEmotionChange}>
-                    <option value="">Select</option>
-                    <option value="loving"><span role='img' aria-label='loving'>😍</span> Loving</option>
-                    <option value="confident"><span role='img' aria-label='confident'>😎</span> Confident</option>
-                    <option value="excited"><span role='img' aria-label='excited'>🤩</span> Excited</option>
-                    <option value="annoyed"><span role='img' aria-label='annoyed'>😠</span> Annoyed</option>
-                    <option value="teasing"><span role='img' aria-label='teasing'>😜</span> Teasing</option>
-                    <option value="sad"><span role='img' aria-label='sad'>😢</span> Sad</option>
-                    <option value="happy"><span role='img' aria-label='happy'>😄</span> Happy</option>
-                    <option value="angry"><span role='img' aria-label='angry'>😡</span> Angry</option>
-                    <option value="nervous"><span role='img' aria-label='nervous'>😰</span> Nervous</option>
-                    <option value="crying"><span role='img' aria-label='crying'>😭</span> Crying</option>
-                </select>
-                {initialEmoji && <span>{initialEmoji}</span>}
-            </div>
-            <div className='Line'></div>
             <h3>Create your own Environment!</h3>
             <textarea value={text} onChange={handleTextChange} />
             <button className='RefreshBtn' onClick={tagEmotions}><IoRefreshCircleOutline /></button>

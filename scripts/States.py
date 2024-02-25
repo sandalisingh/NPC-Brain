@@ -54,6 +54,13 @@ class EmotionStates(Enum):
     Surprise = 26
     Neutral = 27
 
+# Function to get emotion from index
+def get_emotion(index):
+    for emotion in EmotionStates:
+        if emotion.value == index:
+            return emotion.name
+    return None
+
 def get_emoji(emotion):
     emojis = {
         EmotionStates.Amiration: '😊',
