@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as use from '@tensorflow-models/universal-sentence-encoder';
+// import * as use from '@tensorflow-models/universal-sentence-encoder';
 import './EmotionTagger.css';
+import { IoRefreshCircleOutline } from "react-icons/io5";
 
 // Define a basic list of stopwords
 const stopwords = ['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now'];
@@ -26,13 +26,13 @@ const EmotionTagger = () => {
 
     const tagEmotions = async () => {
         // Load the Universal Sentence Encoder
-        const model = await use.load();
+        // const model = await use.load();
 
         // Tokenize the input text and remove stopwords
         const tokens = preprocessText(text);
 
         // Embed the tokens into vectors
-        const embeddings = await model.embed(tokens);
+        // const embeddings = await model.embed(tokens);
 
         // Example: Use a pre-trained emotion classification model to predict emotions
         // Replace this with your own emotion classification model or use an API
@@ -163,27 +163,29 @@ const EmotionTagger = () => {
     };
 
     return (
-        <div>
+        <div className='MediumText Center'> 
+            <div className='Line'></div>
             <div>
                 Initial Emotion:
                 <select value={initialEmotion} onChange={handleInitialEmotionChange}>
                     <option value="">Select</option>
-                    <option value="loving">😍 Loving</option>
-                    <option value="confident">😎 Confident</option>
-                    <option value="excited">🤩 Excited</option>
-                    <option value="annoyed">😠 Annoyed</option>
-                    <option value="teasing">😜 Teasing</option>
-                    <option value="sad">😢 Sad</option>
-                    <option value="happy">😄 Happy</option>
-                    <option value="angry">😡 Angry</option>
-                    <option value="nervous">😰 Nervous</option>
-                    <option value="crying">😭 Crying</option>
+                    <option value="loving"><span role='img' aria-label='loving'>😍</span> Loving</option>
+                    <option value="confident"><span role='img' aria-label='confident'>😎</span> Confident</option>
+                    <option value="excited"><span role='img' aria-label='excited'>🤩</span> Excited</option>
+                    <option value="annoyed"><span role='img' aria-label='annoyed'>😠</span> Annoyed</option>
+                    <option value="teasing"><span role='img' aria-label='teasing'>😜</span> Teasing</option>
+                    <option value="sad"><span role='img' aria-label='sad'>😢</span> Sad</option>
+                    <option value="happy"><span role='img' aria-label='happy'>😄</span> Happy</option>
+                    <option value="angry"><span role='img' aria-label='angry'>😡</span> Angry</option>
+                    <option value="nervous"><span role='img' aria-label='nervous'>😰</span> Nervous</option>
+                    <option value="crying"><span role='img' aria-label='crying'>😭</span> Crying</option>
                 </select>
                 {initialEmoji && <span>{initialEmoji}</span>}
             </div>
+            <div className='Line'></div>
             <h3>Create your own Environment!</h3>
             <textarea value={text} onChange={handleTextChange} />
-            <button onClick={tagEmotions}>Tag Emotions</button>
+            <button className='RefreshBtn' onClick={tagEmotions}><IoRefreshCircleOutline /></button>
             <div>
                 {/* Display emotion tags */}
                 {Object.entries(emotionTags).map(([token, emotions]) => (
