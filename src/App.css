@@ -1,10 +1,46 @@
 .App {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+}
+
+.Line {
+  border-bottom: 2px solid #FDBF60;
+  width: 100%;
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.Center {
+  text-align: center;
+  align-items: center;
+}
+
+.MediumText {
+  font-size: 18px;
+}
+
+.RefreshBtn {
+  background-color: transparent;
+  border-radius: 100%;
+  border: none;
+  font-size: 40px;
+  color: #FF8911;
+  display: block;
+  cursor: pointer;
+}
+
+.RefreshBtn:active, :focus {
+  border: none;
+  color: #FDBF60;
+  background-color: transparent;
 }
 
 header {
+  z-index: 1;
   background-color: #7F27FF;
-  box-shadow: 2px 2px #FF8911;
+  box-shadow: 0 1px #FF8911;
   min-height: 10vh;
   display: flex;
   flex-direction: column;
@@ -12,6 +48,38 @@ header {
   justify-content: center;
   font-size: calc(10px + 2vmin);
   color: #FDBF60;
+  padding-top: 10px;
+}
+
+input {
+  background-color: transparent;
+  border: none;
+  text-align: center;
+  font-size: calc(10px + 2vmin);
+  color: #FDBF60;
+  width: fit-content;
+}
+
+input::placeholder {
+  color: #FDBF60;
+}
+
+input:active, :focus {
+  background-color: white;
+  color: black;
+}
+
+.Dash {
+  width: 200px;
+  height: 2px;
+  background-color: #FDBF60;
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
+.Expanded {
+  width: 100vw;
+  height: 100vh;
 }
 
 .Yellow {
@@ -23,6 +91,7 @@ header {
 }
 
 .BottomRight {
+  z-index: 0;
   position: absolute;
   bottom: 100px;
   right: 100px;

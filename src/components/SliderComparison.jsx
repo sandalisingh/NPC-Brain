@@ -35,25 +35,25 @@ function SliderComparison() {
     };
 
     return (
-        <div>
+        <div className='MediumText SliderBox'>
             {/* Display the sliders and their current values */}
             {sliders.map((slider, index) => (
                 <div key={index}>
-                    <p>{slider.name} : {slider.value}</p>
-                    <input
-                        type="range"
-                        min="0"
-                        max="10"
-                        value={slider.value}
-                        onChange={(event) => handleSliderChange(index, event)}
-                        style={{ width: "300px" }} // Optional: Set the width of the slider
-                    />
+                    <p>{slider.name}
+                        <input
+                            className='Slider'
+                            type="range"
+                            min="0"
+                            max="10"
+                            value={slider.value}
+                            onChange={(event) => handleSliderChange(index, event)}
+                        />{slider.value}</p>
                 </div>
             ))}
 
             {/* Display the selected value from the slider with the maximum value */}
-            <p>Your characters's initial personality: {findMaxSlider()}</p>
-            <p>Your characters's initial emotion: {initialEmotion}</p>
+            <p>Dominant personality: {findMaxSlider()}</p>
+            <p>Initial emotion: {initialEmotion}</p>
         </div>
     );
 }
