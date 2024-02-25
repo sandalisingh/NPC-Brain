@@ -1,2 +1,2 @@
 from convokit import Corpus, download
->>> corpus = Corpus(filename=download("conversations-gone-awry-corpus"))
+corpus = Corpus(filename=download("conversations-gone-awry-corpus"))
