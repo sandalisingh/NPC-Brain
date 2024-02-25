@@ -1,4 +1,5 @@
 import numpy as np
+from States import ActionStates, Range, PersonalityIndex
 
 class ActionGenerator:
 
@@ -18,16 +19,79 @@ class ActionGenerator:
         self.gamma = 0.9  # Discount factor
         self.epsilon = 0.1  # Exploration rate
 
-    # Define reward function (example)
     def calculate_reward(personality_vector, current_action, next_action):
         reward = 0
         
-        # favourable transitions
-        
+        # Define all possible transitions and their associated rewards
+        transitions = {
+            # Unfavorable transitions
+            (ActionStates.Patrolling, ActionStates.Attacking): -1,
+            (ActionStates.Attacking, ActionStates.Fleeing): -1,
+            (ActionStates.Celebrating, ActionStates.Resting): -1,
+            (ActionStates.Helping, ActionStates.Attacking): -1,
+            (ActionStates.Following, ActionStates.Fleeing): -1,
+            # Favorable transitions
+            (ActionStates.Interacting, ActionStates.Helping): 1,
+            (ActionStates.Interacting, ActionStates.Celebrating): 1,
+            (ActionStates.Fleeing, ActionStates.Resting): 1,
+            (ActionStates.Fleeing, ActionStates.Interacting): 1,
+            (ActionStates.Searching, ActionStates.Interacting): 1,
+            (ActionStates.Searching, ActionStates.Patrolling): 1,
+            (ActionStates.Attacking, ActionStates.Resting): 1,
+            (ActionStates.Attacking, ActionStates.Interacting): 1,
+            # Add more transitions as needed
+        }
 
-        # unfavourable transitions
+        # Check if the current and next actions correspond to a defined transition
+        transition_key = (current_action, next_action)
+        if transition_key in transitions:
+            reward = transitions[transition_key]
+
+        # print("Transition Reward = ", reward)
+
+        # preferable action states for each personality
+        personality_preferences = {
+            PersonalityIndex.Openness: {
+                Range.High: (ActionStates.Interacting, ActionStates.Celebrating),
+                Range.Low: (ActionStates.Resting, ActionStates.Following, ActionStates.Patrolling),
+            },
+            PersonalityIndex.Conscientiousness: {
+                Range.High: (ActionStates.Patrolling, ActionStates.Following, ActionStates.Helping),
+                Range.Low: (ActionStates.Resting, ActionStates.Celebrating, ActionStates.Interacting),
+            },
+            PersonalityIndex.Extraversion: {
+                Range.High: (ActionStates.Interacting, ActionStates.Celebrating, ActionStates.Following),
+                Range.Low: (ActionStates.Resting, ActionStates.Searching, ActionStates.Patrolling),
+            },
+            PersonalityIndex.Agreeableness: {
+                Range.High: (ActionStates.Helping, ActionStates.Interacting, ActionStates.Celebrating),
+                Range.Low: (ActionStates.Attacking, ActionStates.Patrolling, ActionStates.Searching),
+            },
+            PersonalityIndex.Neuroticism: {
+                Range.High: (ActionStates.Resting, ActionStates.Fleeing, ActionStates.Interacting),
+                Range.Low: (ActionStates.Patrolling, ActionStates.Attacking, ActionStates.Celebrating),
+            },
+        }
+
+        # Check if next_action is one of the preferred actions for each personality trait
+        for trait, preferences in personality_preferences.items():
+            if personality_vector[trait] in preferences:
+                if next_action in preferences[personality_vector[trait]]:
+                    reward += 1
+
+        # print("Preference Reward = ", reward)
         
-        return reward
+        # Normalize the total reward to the range [-1, 1]
+        max_reward = max(reward for reward in transitions.values()) + len(personality_preferences)  # Add maximum additional reward
+        min_reward = min(reward for reward in transitions.values())
+        if max_reward != min_reward:
+            normalized_reward = 2 * (reward - min_reward) / (max_reward - min_reward) - 1
+        else:
+            normalized_reward = 0  # Handle the case where all rewards are the same
+
+        print("Normalised Reward = ", reward)
+
+        return normalized_reward
 
     def action_generator(self, personality_vector, emotional_state_index, previous_action_state_index) :
         # Choose action based on epsilon-greedy policy
@@ -48,14 +112,25 @@ class ActionGenerator:
 
         return final_action_state_index
 
+    def get_dominant_personality(personality_vector) :
+        dominant_personality_index = np.argmax(personality_vector)
+        print("Dominant Personality = ", dominant_personality_index)
+        return dominant_personality_index
+
     def q_learning(self, personality_vector, current_state, next_state) :
         # Define current and next states
         # current_state = (emotional_state_index, action_state_index)
         # next_state = (next_emotional_state_index, next_action_state_index)
 
-        # Execute action and observe reward         ### DIALOGUE GENERATION !!!!!
+        # Execute action and observe reward         
         reward = self.calculate_reward(current_state[1], next_state[1])
 
         # Update Q-value using Q-learning update rule
-        # for dominant personality !!!!
-        self.Q[current_state][final_action_state_index] = (1 - alpha) * self.Q[current_state][final_action_state_index] + alpha * (reward + gamma * np.max(self.Q[next_state]))
+        # for dominant personality 
+        dominant_personality_index = self.get_dominant_personality(personality_vector)
+        dominant_personality_range = (personality_vector[dominant_personality_index]/3)+1
+        
+        q_current = self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][current_state[1]][next_state[1]]
+        max_q_next = np.max(self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][next_state[1]])
+        self.Q[dominant_personality_index][dominant_personality_range][current_state[0]][current_state[1]][next_state[1]] = \
+            (1 - alpha) * q_current + alpha * (reward + gamma * max_q_next)

@@ -2,6 +2,77 @@
   text-align: center;
 }
 
+header {
+  background-color: #7F27FF;
+  box-shadow: 2px 2px #FF8911;
+  min-height: 10vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: #FDBF60;
+}
+
+.Yellow {
+  background-color: #FDBF60;
+}
+
+.Orange {
+  background-color: #FF8911;
+}
+
+.BottomRight {
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
+  text-align: right;
+}
+
+.ChatBox {
+  position: fixed;
+  bottom: 30px;
+  right: 100px;
+  padding: 12px;
+  border-radius: 50px;
+  box-sizing: content-box;
+  border: none;
+  text-align: center;
+  transition: width 0.3s ease;
+  font-size: 1.2rem;
+}
+
+.ChatBox:focus {
+  border: none;
+  box-shadow: none;
+}
+
+@keyframes bubbleUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 0.8;
+    transform: translateY(0);
+  }
+}
+
+ul {
+  list-style-type: none;
+}
+
+li {
+  float: right;
+  padding: 15px;
+  border-radius: 100px;
+  margin: 10px;
+  width: fit-content;
+  opacity: 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  animation: bubbleUp 0.5s ease forwards;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
