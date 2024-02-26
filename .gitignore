@@ -23,4 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore Python bytecode cache
-__pycache__/
+__pycache__
+
+# Ignore compiled Python files
+*.pyc
