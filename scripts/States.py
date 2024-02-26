@@ -22,7 +22,7 @@ class PersonalityIndex(Enum):
 class Range(Enum):
     Low = range(0, 4)      
     Medium = range(4, 8)   
-    High = range(8, 11)
+    High = range(8, 10)
 
 class EmotionStates(Enum):
     Admiration = 0
@@ -53,6 +53,19 @@ class EmotionStates(Enum):
     Sadness = 25
     Surprise = 26
     Neutral = 27
+
+def get_personality(index):
+    for p in PersonalityIndex:
+        if p.value == index:
+            return p.name
+    return None
+
+# Function to get action from index
+def get_action(index):
+    for action in ActionStates:
+        if action.value == index:
+            return action.name
+    return None
 
 # Function to get emotion from index
 def get_emotion(index):
@@ -126,3 +139,19 @@ def get_perception(emotion):
         EmotionStates.Neutral: "I feel neutral.",
     }
     return perceptions.get(emotion, '')
+
+def index_to_range_value(index) :
+    if index in Range.Low.value:
+        return 0
+    elif index in Range.Medium.value:
+        return 1
+    elif index in Range.High.value:
+        return 2
+
+def index_to_range_key(index) :
+    if index in Range.Low.value:
+        return Range.low
+    elif index in Range.Medium.value:
+        return Range.Medium
+    elif index in Range.High.value:
+        return Range.High
