@@ -3,23 +3,38 @@ from States import ActionStates, Range, PersonalityIndex, index_to_range_value, 
 
 class ActionGenerator:
 
-    def __init__(self):
+    def __init__(self, load_from_file=True):
         # Initialize Q-table
         self.no_of_personality_states = 5    # OCEAN personality model
         self.no_of_ranges_of_personality_states = 3  # 3 ranges for each personality states (0-3, 4-7, 8-10)
         self.no_of_emotional_states = 28  # 10 emotional states
         self.no_of_action_states = 10  # 10 action states
 
-        # initialize Q table
-        # 5 ocean personality * 3 ranges (0-3,4-7,8-10) * 10 emotional states * 10 FROM action states * 10 TO action states
-        self.Q = np.random.random((self.no_of_personality_states, self.no_of_ranges_of_personality_states, self.no_of_emotional_states, self.no_of_action_states, self.no_of_action_states))  # Initialize Q-table with zeros
-        # print("Initializing Q table with shape : ", self.Q.size)
+        if load_from_file:
+            try:
+                self.Q = np.load('Action_Q_Table.npy')
+                print("\nQ-table loaded successfully.\n")
+            except FileNotFoundError:
+                print("\nQ-table not found. Initializing new Q-table.")
+                self.Q = self.initialize_q_table()
+        else:
+            self.Q = self.initialize_q_table()
 
         # Parameters
         self.alpha = 0.1  # Learning rate
         self.gamma = 0.9  # Discount factor
         self.epsilon = 0.1  # Exploration rate
 
+    def initialize_q_table(self):
+        # initialize Q table
+        # 5 ocean personality * 3 ranges (0-3,4-7,8-10) * 10 emotional states * 10 FROM action states * 10 TO action states
+        return np.random.random((self.no_of_personality_states, self.no_of_ranges_of_personality_states,
+                                 self.no_of_emotional_states, self.no_of_action_states, self.no_of_action_states))
+
+    def save_q_table(self):
+        np.save('Action_Q_Table.npy', self.Q)
+        print("Q-table saved successfully.\n")
+    
     def calculate_reward(self, personality_vector, current_action, next_action):
         reward = 0
         
@@ -48,34 +63,44 @@ class ActionGenerator:
         if transition_key in transitions:
             reward = transitions[transition_key]
 
-        print("Transition Reward = ", reward)
+        print("\nTransition Reward = ", reward)
 
         # preferable action states for each personality
         personality_preferences = {
             PersonalityIndex.Openness.value: {
-                Range.High: (ActionStates.Interacting, ActionStates.Celebrating),
-                Range.Medium: (),
-                Range.Low: (ActionStates.Resting, ActionStates.Following, ActionStates.Patrolling),
+                #   imaginative, curious, open-minded, 
+                Range.High: (ActionStates.Helping, ActionStates.Alerted, ActionStates.Interacting, ActionStates.Celebrating),
+                Range.Medium: (ActionStates.Patrolling, ActionStates.Searching, ActionStates.Interacting),
+                #   practical, and prefer familiar routines
+                Range.Low: (ActionStates.Attacking, ActionStates.Resting, ActionStates.Following, ActionStates.Patrolling),
             },
-            PersonalityIndex.Conscientiousness.value: {
-                Range.High: (ActionStates.Patrolling, ActionStates.Following, ActionStates.Helping),
-                Range.Medium: (),
-                Range.Low: (ActionStates.Resting, ActionStates.Celebrating, ActionStates.Interacting),
+            PersonalityIndex.Conscientiousness.value: {     
+                # organized, responsible, dependable, and goal-oriented
+                Range.High: (ActionStates.Attacking, ActionStates.Patrolling, ActionStates.Following, ActionStates.Helping),
+                Range.Medium: (ActionStates.Interacting, ActionStates.Searching, ActionStates.Alerted, ActionStates.Patrolling),
+                #   disorganized, careless, unreliable, and impulsive
+                Range.Low: (ActionStates.Fleeing, ActionStates.Resting, ActionStates.Celebrating, ActionStates.Interacting),
             },
             PersonalityIndex.Extraversion.value: {
-                Range.High: (ActionStates.Interacting, ActionStates.Celebrating, ActionStates.Following),
-                Range.Medium: (),
-                Range.Low: (ActionStates.Resting, ActionStates.Searching, ActionStates.Patrolling),
+                #   sociability, assertiveness, talkativeness, outgoing, energetic
+                Range.High: (ActionStates.Helping, ActionStates.Attacking, ActionStates.Interacting, ActionStates.Celebrating, ActionStates.Following),
+                Range.Medium: (ActionStates.Patrolling, ActionStates.Alerted, ActionStates.Interacting),
+                #   introverts, more reserved, reflective, prefer solitary activities
+                Range.Low: (ActionStates.Fleeing, ActionStates.Resting, ActionStates.Searching, ActionStates.Patrolling),
             },
             PersonalityIndex.Agreeableness.value: {
-                Range.High: (ActionStates.Helping, ActionStates.Interacting, ActionStates.Celebrating),
-                Range.Medium: (),
-                Range.Low: (ActionStates.Attacking, ActionStates.Patrolling, ActionStates.Searching),
+                #   cooperative, empathetic, considerate, compassionate, trusting, and accommodating
+                Range.High: (ActionStates.Helping, ActionStates.Interacting, ActionStates.Celebrating, ActionStates.Following),
+                Range.Medium: (ActionStates.Interacting, ActionStates.Following, ActionStates.Patrolling),
+                #   competitiveness, skepticism, less willing to compromise or cooperate
+                Range.Low: (ActionStates.Resting, ActionStates.Fleeing, ActionStates.Attacking, ActionStates.Searching),
             },
             PersonalityIndex.Neuroticism.value: {
-                Range.High: (ActionStates.Resting, ActionStates.Fleeing, ActionStates.Interacting),
-                Range.Medium: (),
-                Range.Low: (ActionStates.Patrolling, ActionStates.Attacking, ActionStates.Celebrating),
+                #   anxiety, depression, moodiness, vulnerability to stress, emotional instability
+                Range.High: (ActionStates.Resting, ActionStates.Attacking, ActionStates.Fleeing, ActionStates.Interacting),
+                Range.Medium: (ActionStates.Alerted, ActionStates.Searching, ActionStates.Following, ActionStates.Interacting),
+                #   emotionally stable, resilient, calmness, even-temperedness
+                Range.Low: (ActionStates.Helping, ActionStates.Interacting, ActionStates.Patrolling, ActionStates.Celebrating),
             },
         }
 
@@ -98,6 +123,7 @@ class ActionGenerator:
             normalized_reward = 0  # Handle the case where all rewards are the same
 
         print("Normalised Reward = ", reward)
+        print("\n")
 
         return normalized_reward
 
@@ -105,7 +131,7 @@ class ActionGenerator:
         # Choose action based on epsilon-greedy policy
         if np.random.rand() < self.epsilon: 
             final_action_state_index = np.random.randint(self.no_of_action_states)  # Choose random action
-            print("Random final action state index = ", final_action_state_index)
+            print("\nRandom final action state index = ", final_action_state_index)
         else:
             # initialize an array for 10 action states with value 1
             q_val_array = np.ones(10)
@@ -125,33 +151,35 @@ class ActionGenerator:
             
             # select action state with max q value
             final_action_state_index = np.argmax(q_val_array)  # gives the index of that action state
-            print("Final action state index = ", final_action_state_index)
+            print("\nFinal action state index = ", final_action_state_index)
 
+        print("\n")
         return final_action_state_index
 
     def get_dominant_personality(self, personality_vector) :
         dominant_personality_index = np.argmax(personality_vector)
-        print("Dominant Personality = ", dominant_personality_index)
+        print("\nDominant Personality = ", dominant_personality_index)
+        print("\n")
         return dominant_personality_index
 
     def q_learning(self, personality_vector, current_state, next_action_state):
         print("\nStarting with Q Learning ...")
 
         # Define current and next states
-        print("Personality Vector:", personality_vector)
+        print("\nPersonality Vector:", personality_vector)
         print("Current State:", current_state)
         print("Next Action State:", get_action(next_action_state))
 
         # Execute action and observe reward
         reward = self.calculate_reward(personality_vector, current_state[1].value, next_action_state)
-        print("Reward:", reward)
+        print("\nReward:", reward)
 
         # Update Q-value using Q-learning update rule
         # for dominant personality
         dominant_personality_index = self.get_dominant_personality(personality_vector)
         q_range_index = index_to_range_value(personality_vector[dominant_personality_index])
-        print("Dominant Personality :", get_personality(dominant_personality_index))
-        print("Q Range Index:", q_range_index)
+        print("\nDominant Personality :", get_personality(dominant_personality_index))
+        print("\nQ Range Index:", q_range_index)
 
         q_current = self.Q[dominant_personality_index][q_range_index][current_state[0].value][current_state[1].value][next_action_state]
         max_q_next = np.max(self.Q[dominant_personality_index][q_range_index][current_state[0].value][next_action_state])
@@ -159,11 +187,13 @@ class ActionGenerator:
         print("Max Q-value for next state:", max_q_next)
 
         updated_q_value = (1 - self.alpha) * q_current + self.alpha * (reward + self.gamma * max_q_next)
-        print("Updated Q-value:", updated_q_value)
+        print("\nUpdated Q-value:", updated_q_value)
 
         self.Q[dominant_personality_index][q_range_index][current_state[0].value][current_state[1].value][next_action_state] = updated_q_value
 
         # Q table for 
         q_table_slice = self.Q[dominant_personality_index][q_range_index][current_state[0].value]
-        print("Q table slice:")
-        print(q_table_slice)
+        # print("Q table slice:")
+        # print(q_table_slice)
+
+        self.save_q_table()
