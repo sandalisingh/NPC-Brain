@@ -23,7 +23,27 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore Python bytecode cache
-__pycache__
-
-# Ignore compiled Python files
+*/__pycache__
+scripts/__pycache__/*
 *.pyc
+*/my_env
+
+# Ignore models
+*.keras
+*.h5
+*.joblib
+*.npy
+*.pkl
+*.npy
+
+# Ignore datasets
+*.csv
+*.xlsx
+
+# Ignore images
+*.png
+*.jpg
+*.jpeg
+**/*.png
+**/*.jpg
+**/*.jpeg

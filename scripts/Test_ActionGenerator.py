@@ -14,7 +14,7 @@ while(True):
     current_state = (emotional_state_index, previous_action_state_index)
 
     # Call action_generator
-    action_index = action_gen.action_generator(personality_vector, emotional_state_index, previous_action_state_index)
+    action_index = action_gen.generate_action(personality_vector, emotional_state_index, previous_action_state_index)
     print("\n\n-> Generated Action : ", get_action(action_index))
     print("\n\n")
 
