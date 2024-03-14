@@ -5,14 +5,9 @@ import Chat from './Components/Chat';
 import NPC from './Components/NPC';
 
 function App() {
-  var NPC = null;
-
-  const handleInitialization = (environment, personality_vector) => {
-  };
-
   return (
     <div className="App">
-      <Header onSubmitInitials={handleInitialization}/>
+      <Header />
       <NPC />
       <Chat />
     </div>

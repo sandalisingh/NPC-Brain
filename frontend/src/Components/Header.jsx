@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Slider from './Slider';
 import { IoIosRefresh } from "react-icons/io";
+import axios from 'axios';
 
-function Header({onSubmitInitials}) {
+function Header() {
 
     const [expanded, setExpanded] = useState(false);
     const [environment, setEnvironment] = useState('');
@@ -20,8 +21,26 @@ function Header({onSubmitInitials}) {
         setEnvironment(event.target.value);
     }
 
-    const onSubmit = (event) => {
-        onSubmitInitials(environment, personality_vector);
+    const onSubmit = async (event) => {
+        console.log("BUTTON CLICKED")
+
+        event.preventDefault();
+
+        let dataToSend = {
+            environment : environment,
+            personality_vector: personality_vector
+        }
+
+        console.log("data send")
+        console.log(dataToSend)
+
+        try {
+            const response = await axios.post('/initialize', dataToSend); // Replace with actual URL
+            console.log('Data sent successfully:', response);
+        } catch (error) {
+            console.error('Error sending data:', error);
+        }
+
         toggleExpand();
     }
 
@@ -32,7 +51,7 @@ function Header({onSubmitInitials}) {
                 expanded === true ?
                     <p>
                         <Slider onPersonalityVectorChange={handlePersonalityChange} />
-                        <button type='submit' className='RefreshBtn' onSubmit={onSubmit}><IoIosRefresh /></button>
+                        <button type='submit' className='RefreshBtn' onClick={onSubmit}><IoIosRefresh /></button>
                     </p>
                     : null
             }
