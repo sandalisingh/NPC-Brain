@@ -7,6 +7,8 @@ class ActionGenerator:
 
     def __init__(self):
         # Initialize Q-table
+        self.Q_TABLE_NAME = 'scripts/Action_Q_Table.npy'
+
         self.no_of_personality_states = 5    # OCEAN personality model
         self.no_of_ranges_of_personality_states = 3  # 3 ranges for each personality states (0-3, 4-7, 8-10)
         self.no_of_emotional_states = 28  # 10 emotional states
@@ -29,14 +31,14 @@ class ActionGenerator:
 
     def save_q_table(self):
         try:
-            np.save('Action_Q_Table.npy', self.Q)
+            np.save(self.Q_TABLE_NAME, self.Q)
             logging("info", "Q-table saved successfully.")
         except Exception as e:
             logging("error", str(e))
         
     def load_q_table(self):
         try:
-            self.Q = np.load('Action_Q_Table.npy')
+            self.Q = np.load(self.Q_TABLE_NAME)
             logging("info", "Q-table loaded successfully.")
         except Exception as e:
             logging("error", str(e))
