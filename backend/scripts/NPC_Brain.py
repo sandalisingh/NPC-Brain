@@ -4,7 +4,7 @@ from ActionGenerator import ActionGenerator
 from States import ActionStates
 
 class NPC_Brain:
-    def __init__(self, personality_vector, environment):
+    def __init__(self, personality_vector, environment="Resting"):
         self.PERSONALITY_VECTOR = personality_vector
         self.EMOTION_GENERATOR = EmotionGenerator(self.PERSONALITY_VECTOR, environment)
         self.ACTION_GENERATOR = ActionGenerator()
@@ -30,3 +30,4 @@ class NPC_Brain:
     
     def get_current_action_state(self):
         return self.ACTION_STATE
+

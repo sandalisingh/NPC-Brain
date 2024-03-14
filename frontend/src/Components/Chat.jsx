@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../App.css"
 
-function SearchBar() {
+function Chat() {
     const [inputValue, setInputValue] = useState('');
     const [inputList, setInputList] = useState([]);
 
@@ -41,4 +41,4 @@ function SearchBar() {
     );
 }
 
-export default SearchBar;
+export default Chat;

@@ -1,8 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-server/node_modules
+*/node_modules
 /.pnp
 .pnp.js
 
@@ -25,9 +24,10 @@ yarn-error.log*
 
 # Ignore Python bytecode cache
 */__pycache__
-scripts/__pycache__/*
+backend/scripts/__pycache__
 *.pyc
 */my_env
+backend/scripts/my_env
 
 # Ignore models
 *.keras
