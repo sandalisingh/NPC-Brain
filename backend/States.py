@@ -68,7 +68,7 @@ class Range(Enum):
             return 0
         elif index in Range.Medium.value:
             return 1
-        elif index in Range.High.value:
+        elif index in Range.High.value or index is 10:
             return 2
 
     @staticmethod

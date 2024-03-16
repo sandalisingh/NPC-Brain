@@ -1,15 +1,40 @@
+/* General Styles */
+
+body{
+  background-color: #7F27FF;
+  opacity: 0.7;
+  background-image:  linear-gradient(#9F70FD 0.8px, transparent 0.8px), linear-gradient(to right, #9F70FD 0.8px, #9552f9 0.8px);
+  background-size: 16px 16px;
+}
+
 .App {
   text-align: center;
   display: flex;
   flex-direction: column;
+  padding: 3% 7%;
+  height: 100%;
 }
 
-.Line {
-  border-bottom: 2px solid #FDBF60;
-  width: 100%;
-  display: block;
-  margin-top: 5px;
-  margin-bottom: 10px;
+/* Text and Typography */
+
+.MediumText {
+  font-size: 18px;
+}
+
+/* Coloring */
+
+.Yellow {
+  background-color: #FDBF60;
+}
+
+.Orange {
+  background-color: #FF8911;
+}
+
+/* Positioning */
+
+.ToRight{
+  float: right;
 }
 
 .Center {
@@ -17,31 +42,30 @@
   align-items: center;
 }
 
-.MediumText {
-  font-size: 18px;
+.BottomRight {
+  z-index: 0;
+  position: absolute;
+  bottom: 100px;
+  right: 100px;
+  text-align: right;
 }
 
-.RefreshBtn {
-  background-color: transparent;
-  border-radius: 100%;
-  border: none;
-  font-size: 40px;
-  color: #FF8911;
+/* Lines and Dividers */
+
+.Line {
+  border-bottom: 1px solid #FDBF60;
+  width: 100%;
   display: block;
-  cursor: pointer;
+  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
-.RefreshBtn:active, :focus {
-  border: none;
-  color: #FDBF60;
-  background-color: transparent;
-}
+/* Header Styles */
 
 header {
   z-index: 1;
   background-color: #7F27FF;
   box-shadow: 0 1px #FF8911;
-  min-height: 10vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,24 +73,11 @@ header {
   font-size: calc(10px + 2vmin);
   color: #FDBF60;
   padding-top: 10px;
-}
-
-input {
-  background-color: transparent;
-  border: none;
-  text-align: center;
-  font-size: calc(10px + 2vmin);
-  color: #FDBF60;
-  width: fit-content;
-}
-
-input::placeholder {
-  color: #FDBF60;
-}
-
-input:active, :focus {
-  background-color: white;
-  color: black;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 10vh;
+  width: 100%;
 }
 
 .Dash {
@@ -82,21 +93,66 @@ input:active, :focus {
   height: 100vh;
 }
 
-.Yellow {
-  background-color: #FDBF60;
+/* Input Styles */
+
+input {
+  background-color: transparent;
+  border: none;
+  text-align: center;
+  font-size: calc(10px + 2vmin);
+  color: #FDBF60;
+  width: fit-content;
 }
 
-.Orange {
-  background-color: #FF8911;
+input::-webkit-inner-spin-button,
+input::-webkit-outer-spin-button { /* For number input types */
+  opacity: 0; /* Hide arrows in number inputs */
 }
 
-.BottomRight {
-  z-index: 0;
-  position: absolute;
-  bottom: 100px;
-  right: 100px;
-  text-align: right;
+input::placeholder {
+  color: #FDBF60; /* Adjust for better contrast */
 }
+
+/* Focus styles (modified) */
+input:focus {
+  outline: 2px solid #FDBF60; /* Add an outline on focus */
+}
+
+/* Button Styles */
+
+.RefreshBtn {
+  background-color: transparent;
+  padding: 0;
+  margin: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 100%; /* Maintain circular shape */
+  border: none; /* Keep borderless appearance */
+  font-size: 20px; /* Adjust as needed for desired icon size */
+  color: #FF8911; /* Set primary color */
+
+  /* Enhanced styling and visual appeal */
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Add smooth transitions on hover */
+  box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1); /* Subtle box-shadow for depth */
+
+  display: flex; /* Enable flexbox for centering */
+  align-items: center; /* Align content vertically */
+  justify-content: center; /* Center content horizontally */
+}
+
+.RefreshBtn:hover, .RefreshBtn:active, .RefreshBtn:focus {
+  border-radius: 100%;
+  background-color: rgba(255, 137, 17, 0.2); /* Slight background tint on hover */
+  color: #fff; /* Change text color to white on hover/focus */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3); /* Increased box-shadow for hover/focus */
+}
+
+.RefreshBtn svg {
+  width: 100%; /* Scale icon to fill button width */
+  height: 100%; /* Scale icon to fill button height */
+}
+
+/* Chat Box Styles */
 
 .ChatBox {
   position: fixed;
@@ -109,6 +165,7 @@ input:active, :focus {
   text-align: center;
   transition: width 0.3s ease;
   font-size: 1.2rem;
+  color: black;
 }
 
 .ChatBox:focus {
@@ -116,13 +173,57 @@ input:active, :focus {
   box-shadow: none;
 }
 
+.ChatBox::placeholder {
+  color: #000000c8;
+}
+
+/* Slider Styles */
+
+.SliderBox {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.Slider {
+  margin: 2rem;
+  width: 100px;
+  height: 2px;
+  margin: 10px;
+  cursor: pointer;
+  opacity: 0.7;
+  background-color: #FF8911;
+  -webkit-appearance: none;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.Slider:hover {
+  opacity: 1;
+}
+
+.Slider:active {
+  opacity: 1;
+  background-color: #FF8911;
+}
+
+.Slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 15px;
+  height: 25px;
+  border-radius: 100%;
+  background: #FF8911;
+  cursor: pointer;
+}
+
+/* Bubble Chat */
+
 @keyframes bubbleUp {
   0% {
     opacity: 0;
     transform: translateY(20px);
   }
   100% {
-    opacity: 0.8;
+    opacity: 0.95;
     transform: translateY(0);
   }
 }
@@ -131,70 +232,30 @@ ul {
   list-style-type: none;
 }
 
-li {
-  float: right;
+.Bubble {
   padding: 15px;
   border-radius: 100px;
   margin: 10px;
-  width: fit-content;
+  width: fit-content !important;
   opacity: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   animation: bubbleUp 0.5s ease forwards;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+/* NPC Chat Styling */
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.slider-container {
-  margin-bottom: 10px;
-}
-
-.SliderBox {
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.Slider {
-  width: 100px;
-  height: 2px;
-  margin: 5px;
-}
-
-.slider-value {
+.Emoji {
   text-align: center;
-  font-size: 10px;
-  margin-left: 5px;
+  font-size: 22rem;
 }
+
+.NPC-box {
+  width: 70% !important;
+  height: 80vh;
+  background-color: transparent;
+}
+
+/* .Message-box {
+  padding: 1rem;
+} */
+

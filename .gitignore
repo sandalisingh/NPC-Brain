@@ -48,3 +48,6 @@ backend/scripts/my_env
 **/*.png
 **/*.jpg
 **/*.jpeg
+
+backend/config.yaml
+backend/flask_session

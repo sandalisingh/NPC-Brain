@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import "../App.css"
+import axios from 'axios';
+import { MessagesContext } from '../App';
 
 function Chat() {
+    const { messages, updateMessages } = React.useContext(MessagesContext);
+
     const [inputValue, setInputValue] = useState('');
     const [inputList, setInputList] = useState([]);
 
@@ -9,10 +13,46 @@ function Chat() {
         setInputValue(event.target.value);
     };
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = async (event) => {
         if (event.key === 'Enter') {
+
             setInputList(prevList => [...prevList.slice(-1), inputValue]);
             setInputValue('');
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+    
+                // const sessionId = localStorage.getItem('session_id');
+                // if (sessionId) {
+                //     headers['Cookie'] = `session=${sessionId}`;
+                // }
+    
+                // Send a preflight OPTIONS request to check CORS
+                await axios.options('http://127.0.0.1:5000/get_response', {
+                    headers: headers,
+                    withCredentials: true
+                });
+    
+                const response = await axios.post(
+                    'http://127.0.0.1:5000/get_response',
+                    { chat: inputValue },
+                    {
+                        headers: headers,
+                        withCredentials: true
+                    }
+                );
+
+                // console.log("SESSION ID")
+                // console.log(sessionId)
+
+                updateMessages(response.data);
+                console.log(messages)
+
+            } catch (error) {
+                console.error('Error sending data:', error);
+            }
         }
     };
 
@@ -21,8 +61,8 @@ function Chat() {
             <div>
                 <ul>
                     {inputList.map((text, index) => (
-                        <div style={{display:'block'}}>
-                        <li className="Orange" key={index}>{text}</li>
+                        <div style={{ display: 'block' }} key={index}>
+                            <p className="Orange ToRight Bubble" key={index}>{text}</p>
                         </div>
                     ))}
                 </ul>

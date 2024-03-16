@@ -16,7 +16,7 @@ function Slider({onPersonalityVectorChange}) {
 
     return (
         <div className='MediumText SliderBox'>
-            {/* Display the sliders and their current values */}
+        <div className='Line'></div>
             {slider_vector.map((slider, index) => (
                 <div key={index}>
                     <p>{SliderNames[index]}
@@ -30,6 +30,7 @@ function Slider({onPersonalityVectorChange}) {
                         />{slider}</p>
                 </div>
             ))}
+            <div className='Line'></div>
         </div>
     );
 }

@@ -7,7 +7,7 @@ class ActionGenerator:
 
     def __init__(self):
         # Initialize Q-table
-        self.Q_TABLE_NAME = 'scripts/Action_Q_Table.npy'
+        self.Q_TABLE_NAME = 'Action_Q_Table.npy'
 
         self.no_of_personality_states = 5    # OCEAN personality model
         self.no_of_ranges_of_personality_states = 3  # 3 ranges for each personality states (0-3, 4-7, 8-10)
