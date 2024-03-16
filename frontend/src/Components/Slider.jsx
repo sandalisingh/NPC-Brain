@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import '../App.css';
 
-function Slider({onPersonalityVectorChange}) {
-    const SliderNames = ['Openness','Conscientiousness','Extraversion','Agreeableness','Neuroticism'];
+function Slider({ onPersonalityVectorChange }) {
+    const SliderNames = ['Openness', 'Conscientiousness', 'Extraversion', 'Agreeableness', 'Neuroticism'];
 
-    const [slider_vector, setSliderVector] = useState([0,0,0,0,0]); // State to store the names, values, and options of sliders
+    const [slider_vector, setSliderVector] = useState([0, 0, 0, 0, 0]); // State to store the names, values, and options of sliders
 
     // Function to handle change in slider value
     const handleSliderChange = (index, event) => {
@@ -16,7 +16,10 @@ function Slider({onPersonalityVectorChange}) {
 
     return (
         <div className='MediumText SliderBox'>
-        <div className='Line'></div>
+            <div className='Line'></div>
+            <p>
+                OCEAN personality model<br />
+            </p>
             {slider_vector.map((slider, index) => (
                 <div key={index}>
                     <p>{SliderNames[index]}

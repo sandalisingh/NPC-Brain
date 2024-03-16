@@ -30,35 +30,41 @@ function NPC() {
     return (
         <Container fluid className="NPC-box">
             <Row>
-                <Col lg={8}>
+                <Col lg={6} sm={12}>
                     {messages.length > 0 && messages[messages.length - 1].emoji && (
                         <span role="img" aria-label='emoji' className='Emoji'>{messages[messages.length - 1].emoji}</span>
                     )}
                 </Col>
-                <Col>
-                    <Row style={{ height: '50%' }}></Row>
+                <Col style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', alignItems: 'flex-start' }}>
                     <Row>
-                        {messages.length > 1 && (
-                            <p className="Orange Bubble">
-                                {messages[messages.length - 2].reply}
-                                {messages[messages.length - 2].action && (
-                                    <span>({messages[messages.length - 2].action})</span>
+                        <Col>
+                            <ul tyle={{ marginTop: 'auto' }}>
+                                {window.outerWidth >= 576 && messages.length > 1 && (
+                                    <p className="Orange Bubble">
+                                        {messages[messages.length - 2].reply}
+                                        {messages[messages.length - 2].reply && (
+                                            <br />
+                                        )}
+                                        {messages[messages.length - 2].action && (
+                                            <span>({messages[messages.length - 2].action})</span>
+                                        )}
+                                    </p>
                                 )}
-                            </p>
-                        )}
-                        {messages.length > 0 && (
-                            <p className="Orange Bubble">
-                                {messages[messages.length - 1].reply && (
-                                    messages[messages.length - 1].reply
+                                {messages.length > 0 && (
+                                    <p className="Orange Bubble">
+                                        {messages[messages.length - 1].reply && (
+                                            <>
+                                                {messages[messages.length - 1].reply}
+                                                <br />
+                                            </>
+                                        )}
+                                        {messages[messages.length - 1].action && (
+                                            <span>({messages[messages.length - 1].action})</span>
+                                        )}
+                                    </p>
                                 )}
-                                {messages[messages.length - 1].reply && (
-                                    <br />
-                                )}
-                                {messages[messages.length - 1].action && (
-                                    <span>({messages[messages.length - 1].action})</span>
-                                )}
-                            </p>
-                        )}
+                            </ul>
+                        </Col>
                     </Row>
                 </Col>
             </Row>

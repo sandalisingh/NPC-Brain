@@ -56,9 +56,11 @@ function Header() {
                 expanded === true ?
                     <div>
                         <Slider onPersonalityVectorChange={handlePersonalityChange} />
-                        <button type='submit' className='RefreshBtn' onClick={onSubmit}>
-                            <BsEmojiSunglasses />
-                        </button>
+                        <div className='Center'>
+                            <button type='submit' className='RefreshBtn' onClick={onSubmit}>
+                                <BsEmojiSunglasses />
+                            </button>
+                        </div>
                     </div>
                     : null
             }

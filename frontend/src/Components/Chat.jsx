@@ -60,11 +60,16 @@ function Chat() {
         <div className="BottomRight">
             <div>
                 <ul>
-                    {inputList.map((text, index) => (
-                        <div style={{ display: 'block' }} key={index}>
-                            <p className="Orange ToRight Bubble" key={index}>{text}</p>
+                {window.outerWidth >= 576 && inputList.length > 1 && (
+                    <div style={{ display: 'block' }} key={0}>
+                            <p className="Orange ToRight Bubble" key={0}>{inputList[inputList.length-2]}</p>
                         </div>
-                    ))}
+                )}
+                {inputList.length > 0 && (
+                    <div style={{ display: 'block' }} key={1}>
+                            <p className="Orange ToRight Bubble" key={1}>{inputList[inputList.length-1]}</p>
+                        </div>
+                )}
                 </ul>
             </div>
             <input

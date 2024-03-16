@@ -37,9 +37,15 @@ body{
   float: right;
 }
 
-.Center {
+/* .Center {
   text-align: center;
   align-items: center;
+} */
+
+.Center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .BottomRight {
@@ -48,6 +54,16 @@ body{
   bottom: 100px;
   right: 100px;
   text-align: right;
+}
+
+.ToBottom-Parent {
+  position: relative;
+}
+
+.ToBottom {
+  position: absolute;
+  bottom: 0;
+  /* left: 0; */
 }
 
 /* Lines and Dividers */
@@ -135,9 +151,7 @@ input:focus {
   transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; /* Add smooth transitions on hover */
   box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1); /* Subtle box-shadow for depth */
 
-  display: flex; /* Enable flexbox for centering */
-  align-items: center; /* Align content vertically */
-  justify-content: center; /* Center content horizontally */
+  margin-bottom: 30px;
 }
 
 .RefreshBtn:hover, .RefreshBtn:active, .RefreshBtn:focus {
@@ -235,11 +249,12 @@ ul {
 .Bubble {
   padding: 15px;
   border-radius: 100px;
-  margin: 10px;
+  margin-bottom: 10px;
   width: fit-content !important;
   opacity: 0;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
   animation: bubbleUp 0.5s ease forwards;
+  display: block;
 }
 
 /* NPC Chat Styling */
@@ -247,6 +262,12 @@ ul {
 .Emoji {
   text-align: center;
   font-size: 22rem;
+}
+
+@media (max-width: 575.98px) {
+  .Emoji {
+    font-size: 12rem; /* Decrease the size of emoji for smaller screens */
+  }
 }
 
 .NPC-box {

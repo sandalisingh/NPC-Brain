@@ -28,7 +28,7 @@ app.config['SESSION_COOKIE_SAMESITE'] = 'Strict'  # Apply strict same-site polic
 
 Session(app)  # Initialize Flask-Session
 
-npc_brain = NPC_Brain()
+# npc_brain = NPC_Brain()
 
 @app.route('/')
 def npc_world():
@@ -85,11 +85,11 @@ def get_response():
         print(f"Session ID: {session.sid}")
         print(f"Session: {session}")
 
-        # npc_brain = session.get('npc_brain')
+        npc_brain = session.get('npc_brain')
 
-        # # Check if npc_brain is None
-        # if npc_brain is None:
-        #     raise Exception("NPC Brain not initialized")
+        # Check if npc_brain is None
+        if npc_brain is None:
+            raise Exception("NPC Brain not initialized")
 
         data = request.get_json()
         chat = data['chat']
@@ -133,11 +133,11 @@ def get_states():
         # print(f"Session ID: {session.sid}")
         # print(f"Session: {session}")
 
-        # npc_brain = session.get('npc_brain')
+        npc_brain = session.get('npc_brain')
 
-        # # Check if npc_brain is None
-        # if npc_brain is None:
-        #     raise Exception("NPC Brain not initialized")
+        # Check if npc_brain is None
+        if npc_brain is None:
+            raise Exception("NPC Brain not initialized")
 
         emoji = str(npc_brain.get_emoji())
         action = str(npc_brain.get_current_action_state())

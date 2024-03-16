@@ -27,7 +27,7 @@ class NPC_Brain:
 
         prev_state = [prev_emotion_state, prev_action_state]
         self.ACTION_GENERATOR.q_learning(self.PERSONALITY_VECTOR, prev_state, self.ACTION_STATE)
-        return "DUMMY REPLY"
+        return "Dummy text"
 
     def get_emoji(self):
         return self.EMOTION_GENERATOR.get_current_emotion_emoji()
