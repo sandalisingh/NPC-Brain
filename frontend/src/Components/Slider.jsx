@@ -18,8 +18,9 @@ function Slider({ onPersonalityVectorChange }) {
         <div className='MediumText SliderBox'>
             <div className='Line'></div>
             <p>
-                OCEAN personality model<br />
+                Craft your character's personality<br />
             </p>
+            <div className='Line'></div>
             {slider_vector.map((slider, index) => (
                 <div key={index}>
                     <p>{SliderNames[index]}

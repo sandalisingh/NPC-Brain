@@ -51,7 +51,7 @@ function Header() {
 
     return (
         <header className={`header ${expanded ? 'Expanded' : ''}`}>
-            <input onClick={expanded === false ? toggleExpand : null} name='environment' value={environment} placeholder='Create scenario' onChange={handleEnvironment}></input>
+            <input onClick={expanded === false ? toggleExpand : null} name='environment' value={environment} placeholder='Forge the reality !' onChange={handleEnvironment}></input>
             {
                 expanded === true ?
                     <div>
