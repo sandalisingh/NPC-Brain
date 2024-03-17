@@ -30,7 +30,7 @@ class DialogueGenerator:
 
     def load_model(self):
         try:
-            self.MODEL = load_model(self.MODEL_NAME+".keras")
+            self.MODEL = load_model(self.MODEL_NAME)
             logging("info", "Model loaded.")
         except Exception as e:
             logging("error", "Error loading model: "+str(e))
@@ -39,7 +39,7 @@ class DialogueGenerator:
     def save_model(self):
         if self.MODEL is not None:
             try:
-                self.MODEL.save(os.path.join(os.getcwd(), self.MODEL_NAME+".keras"))
+                self.MODEL.save(self.MODEL_NAME)
                 logging("info", "Model saved.")
             except Exception as e:
                 logging("error", "Error saving model: " + str(e))
