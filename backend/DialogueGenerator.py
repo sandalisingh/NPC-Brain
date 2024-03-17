@@ -22,7 +22,7 @@ class DialogueGenerator:
         self.VOCAB_SIZE = 10000   # Vocabulary size
         self.EMBEDDING_DIM = 300  # Embedding dimension
         self.HIDDEN_DIM = 512     # Hidden dimension for LSTM layers
-        self.MODEL_NAME = "dialogue_generator_model"
+        self.MODEL_NAME = "backend/models/dialogue_generator_model.keras"
         self.MODEL = None
         self.TOKENIZER = Tokenizer(self.VOCAB_SIZE)
 
