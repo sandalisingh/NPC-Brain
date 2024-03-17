@@ -147,7 +147,7 @@ class EmotionGenerator:
         return self.EMOTION_TUPLE[0]
     
     def get_current_emotion_as_string(self):
-        return EmotionStates.index_to_enum(self.EMOTION_TUPLE[0].value)
+        return self.EMOTION_TUPLE[0].name
 
     def get_current_emotion_emoji(self):
         return EmotionStates.get_emoji(self.EMOTION_TUPLE[0])

@@ -11,7 +11,7 @@ from States import logging, EmotionStates
 
 class EmotionClassifier:
     def __init__(self):
-        self.MODEL_NAME = 'emotion_classifier_model.joblib'
+        self.MODEL_NAME = 'backend/emotion_classifier_model.joblib'
         self.MODEL = self.load_model()
 
     def load_and_preprocess_datasets(self, dataset_files):

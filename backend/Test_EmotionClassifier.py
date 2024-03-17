@@ -1,5 +1,6 @@
-from EmotionClassifier import emotion_classifier
-from States import get_emotion
+from EmotionClassifier import EmotionClassifier
+emotion_classifier = EmotionClassifier()
 
-text = input("Text : ")
-print("Test Emotion :", emotion_classifier(text))
+while(True) :
+    text = input("Text : ")
+    print("Emotion :", emotion_classifier.predict(text).name)

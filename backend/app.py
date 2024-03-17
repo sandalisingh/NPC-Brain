@@ -44,6 +44,10 @@ def initialize():
         return response
 
     try:
+
+        print(f"Session ID: {session.sid}")
+        print(f"Session: {session}")
+        
         data = request.get_json()
         environment = data['environment']
         personality_vector = data['personality_vector']
