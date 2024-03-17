@@ -30,6 +30,7 @@ backend/scripts/__pycache__
 backend/scripts/my_env
 
 # Ignore models
+backend/models
 *.keras
 *.h5
 *.joblib

@@ -1,6 +1,6 @@
 from EmotionGenerator import EmotionGenerator
 from ActionGenerator import ActionGenerator
-# from DialogueGenerator import DialogueGenerator
+from DialogueGenerator import DialogueGenerator
 from States import ActionStates
 
 class NPC_Brain:
@@ -8,6 +8,7 @@ class NPC_Brain:
         self.PERSONALITY_VECTOR = personality_vector
         self.EMOTION_GENERATOR = EmotionGenerator(self.PERSONALITY_VECTOR, environment)
         self.ACTION_GENERATOR = ActionGenerator()
+        self.DIALOGUE_GENERATOR = DialogueGenerator()
         
         if emotional_state is None:
             self.EMOTIONAL_STATE = self.EMOTION_GENERATOR.get_emotion_state()
@@ -27,13 +28,19 @@ class NPC_Brain:
 
         prev_state = [prev_emotion_state, prev_action_state]
         self.ACTION_GENERATOR.q_learning(self.PERSONALITY_VECTOR, prev_state, self.ACTION_STATE)
-        return "Dummy text"
+
+        reply = self.DIALOGUE_GENERATOR.generate_response_with_beam_search(chat_text, self.get_current_emotion_state())
+
+        if reply == "":
+            reply = "I don't know."
+
+        return reply
 
     def get_emoji(self):
         return self.EMOTION_GENERATOR.get_current_emotion_emoji()
     
     def get_current_emotion_state(self):
-        return self.EMOTIONAL_STATE
+        return self.EMOTIONAL_STATE.name
     
     def get_current_action_state(self):
         return self.ACTION_STATE.name
