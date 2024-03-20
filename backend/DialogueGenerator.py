@@ -12,6 +12,8 @@ from PositionalEncoding import PositionalEncoding
 from DataManager import DataManager
 from DataVisualizer import DataVisualizer
 from Tokenizer import Tokenizer
+from SequenceAnalyzer import SequenceAnalyzer
+from sklearn.model_selection import train_test_split
 
 class DialogueGenerator:
 
@@ -143,18 +145,14 @@ class DialogueGenerator:
 
     #   TRAINING
     
-    def test_model(self, dataset_filename):
-        chat_text, text_response, emotion = DataManager.prepare_data(dataset_filename)
-        
+    def test_model(self, chat_text, text_response, emotion):
         # Preprocess data
         chat_text_input, emotion_input, prev_seq, output_seq, output_state = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
 
         loss, dense_of_seq_loss, dense_of_state_loss, dense_of_seq_accuracy, dense_of_state_accuracy = self.MODEL.evaluate([chat_text_input, emotion_input, prev_seq], [output_seq, output_state])
-        logging("info", f"Model Evaluation\n\tloss: {loss}\n\tdense_of_seq_loss: {dense_of_seq_loss}\n\tdense_of_state_loss: {dense_of_state_loss}\n\tdense_of_seq_accuracy: {dense_of_seq_accuracy}\n\tdense_of_state_accuracy: {dense_of_state_accuracy}")
+        logging("info", f"Model Tested.\n\tloss: {loss}\n\tdense_of_seq_loss: {dense_of_seq_loss}\n\tdense_of_state_loss: {dense_of_state_loss}\n\tdense_of_seq_accuracy: {dense_of_seq_accuracy}\n\tdense_of_state_accuracy: {dense_of_state_accuracy}")
 
-    def train_model(self, dataset_filename):
-        chat_text, text_response, emotion = DataManager.prepare_data(dataset_filename)
-        
+    def train_model(self, chat_text, text_response, emotion, epochs):
         # Preprocess data
         chat_text_input, emotion_input, prev_seq, output_seq, output_state = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
 
@@ -165,7 +163,7 @@ class DialogueGenerator:
         validation_split = 0.2  # 20% of training data for validation
 
         # Train the model with validation split
-        history = self.MODEL.fit([chat_text_input, emotion_input, prev_seq], [output_seq, output_state], batch_size=64, epochs=10, validation_split=validation_split)
+        history = self.MODEL.fit([chat_text_input, emotion_input, prev_seq], [output_seq, output_state], batch_size=64, epochs=epochs, validation_split=validation_split)
 
         DataVisualizer.plot_train_history(history.history, 'dense_of_seq', 'Model Training')
         DataVisualizer.plot_train_history(history.history, 'val_dense_of_seq', 'Model Validation')
@@ -173,6 +171,16 @@ class DialogueGenerator:
         DataVisualizer.plot_train_history(history.history, 'val_dense_of_state', 'Model Validation')
 
         logging("info", "Model trained.")    
+
+        self.save_model()
+
+    def train_and_test(self, dataset_filename, epochs=10, test_size=0.2, random_state=42):
+        chat_text, text_response, emotion = DataManager.prepare_data(dataset_filename)
+
+        chat_train, chat_test, response_train, response_test, emotion_train, emotion_test = train_test_split(chat_text, text_response, emotion, test_size=test_size, random_state=random_state)
+
+        self.train_model(chat_train, response_train, emotion_train, epochs)
+        self.test_model(chat_test, response_test, emotion_test)
 
         self.save_model()
 
@@ -192,11 +200,11 @@ class DialogueGenerator:
         chat_text_input, emotion_input, prev_seq, _, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
         prev_seq = tf.tensor_scatter_nd_update(prev_seq, indices=[[0, 1]], updates=[0])
 
-        DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
+        # DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
 
         for i in range(1, self.MAX_SEQ_LENGTH):
             # Predict the next token
-            _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq])
+            _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
             
             # Get the token index with the highest probability (greedy approach)
             predicted_token_index = np.argmax(predicted_state[0, :])
@@ -221,10 +229,10 @@ class DialogueGenerator:
         chat_text_input, emotion_input, prev_seq, _, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
         prev_seq = tf.tensor_scatter_nd_update(prev_seq, indices=[[0, 1]], updates=[0])
 
-        DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
+        # DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
 
         # Initialize beam search set
-        beam_list = [(prev_seq, 0)]
+        beam_list = [(prev_seq, 1.0)]
 
         # Initialize the final generated sequences
         final_sequences_list = []
@@ -236,7 +244,7 @@ class DialogueGenerator:
             for prev_seq, score in beam_list:
 
                 # Predict the next token probabilities
-                _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq])
+                _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
 
                 # Get the top tokens with their probabilities
                 top_token_indices = np.argsort(predicted_state[0])[-beam_width:]
@@ -252,17 +260,18 @@ class DialogueGenerator:
                     # Insert the token at the correct position
                     candidate_seq[0, next_token_position] = token_index
 
-                    # Calculate the score for the candidate sequence
-                    candidate_score = score - np.log(predicted_state[0, token_index])       # negative likelyhood
+                    # # Calculate the score for the candidate sequence
+                    # candidate_score = score - np.log(predicted_state[0, token_index])       # negative likelyhood
 
-                    # Add penalty if the current token is equal to the previous token
-                    if next_token_position > 0 and candidate_seq[0, next_token_position] == candidate_seq[0, next_token_position - 1]:
-                        penalty = -15  # You can adjust the penalty factor as needed
-                        candidate_score += penalty
+                    # # Add penalty if the current token is equal to the previous token
+                    # if next_token_position > 0 and candidate_seq[0, next_token_position] == candidate_seq[0, next_token_position - 1]:
+                    #     penalty = -15  # You can adjust the penalty factor as needed
+                    #     candidate_score += penalty
 
-                    # Normalize score by dividing by the length of the sequence raised to a power
-                    length_factor = 0.7  # You can adjust this factor as needed
-                    candidate_score /= len(candidate_seq[0])**length_factor
+                    # # Normalize score by dividing by the length of the sequence raised to a power
+                    # length_factor = 0.7  # You can adjust this factor as needed
+                    # candidate_score /= len(candidate_seq[0])**length_factor
+                    candidate_score = score + SequenceAnalyzer.calculate_score(candidate_seq[0], chat_text_input[0].numpy(), i+2, predicted_state[0, token_index])
 
                     # Check if the sequence is complete
                     if token_index == self.TOKENIZER.END_TOKEN:
@@ -270,20 +279,20 @@ class DialogueGenerator:
                     else:
                         candidates_list.append((candidate_seq, candidate_score))
 
-            # Select top candidates to continue beam search
-            beam_list = sorted(candidates_list, key=lambda x: x[1])[:beam_width]
+            # Select candidates with highest scores - sorted in asc order
+            beam_list = sorted(candidates_list, key=lambda x: x[1])[-beam_width:]
 
             # Check for completion of sequences
             if len(completed_sequences_list)>0:
                 final_sequences_list.append(completed_sequences_list)
 
             if final_sequences_list:
-                final_sequences_list = sorted(final_sequences_list, key=lambda x: x[1])
-                best_seq = final_sequences_list.pop()[0]
+                final_sequences_list = sorted(final_sequences_list, key=lambda x: x[1]) # asc order
+                best_seq = final_sequences_list[-1][0]   # highest score is the last row
             else:
-                best_seq = beam_list.pop()[0]
+                best_seq = beam_list[-1][0]  # highest score is the last row
 
-            # Decode the best sequence into text
-            response_text = self.sequence_to_text(np.array([best_seq]))
+        # Decode the best sequence into text
+        response_text = self.sequence_to_text(np.array([best_seq]))
 
         return response_text
