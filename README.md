@@ -1,4 +1,4 @@
-# Project Name - NPC Brain
+# Project Name - Moody (NPC Brain)
 
 ## Description
 
