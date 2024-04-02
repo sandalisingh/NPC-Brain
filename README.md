@@ -6,9 +6,8 @@ This repository contains the code for an AI project aimed at creating emotionall
 
 ## Output screenshots
 
-![Screenshot 1](https://raw.githubusercontent.com/sandalisingh/NPC-Brain/main/assets/77054645/e9b0ee34-cf0d-464b-97d8-b06c2444871e.png)
-
-![Screenshot 2](https://raw.githubusercontent.com/sandalisingh/NPC-Brain/main/assets/77054645/0da5236d-15b6-4148-8afd-4ce38c41231a.png)
+![Screenshot 2024-04-02 at 11 28 30 PM](https://github.com/sandalisingh/NPC-Brain/assets/77054645/e9b0ee34-cf0d-464b-97d8-b06c2444871e)
+![Screenshot 2024-04-02 at 11 28 30 PM](https://github.com/sandalisingh/NPC-Brain/assets/77054645/0da5236d-15b6-4148-8afd-4ce38c41231a)
 
 ## Technologies Used
 
