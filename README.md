@@ -4,6 +4,12 @@
 
 This repository contains the code for an AI project aimed at creating emotionally intelligent non-player characters (NPCs) for use in various applications such as gaming, virtual assistants, and more. The project utilizes machine learning techniques to imbue NPCs with the ability to recognize and respond to emotions.
 
+## Output screenshots
+
+https://github.com/sandalisingh/NPC-Brain/assets/77054645/e9b0ee34-cf0d-464b-97d8-b06c2444871e
+https://github.com/sandalisingh/NPC-Brain/assets/77054645/0da5236d-15b6-4148-8afd-4ce38c41231a
+
+
 ## Technologies Used
 
 - React: 18.2.0
