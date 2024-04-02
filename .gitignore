@@ -50,6 +50,8 @@ backend/models
 **/*.jpg
 **/*.jpeg
 
+frontend/src/ColorPalette
+
 backend/config.yaml
 backend/flask_session
 *flask_session

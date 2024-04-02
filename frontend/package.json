@@ -12,14 +12,12 @@
     "bootstrap": "^5.3.3",
     "compromise": "^14.11.2",
     "js-cookie": "^3.0.5",
-    "lemmatizer": "^0.0.1",
     "natural": "^6.10.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
     "react-scripts": "^3.0.1",
-    "stopword": "^3.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
