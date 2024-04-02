@@ -29,41 +29,6 @@ This repository contains the code for an AI project aimed at creating emotionall
 1. Navigate to the frontend directory: `cd frontend`
 2. Start the npm server: `npm start`
 
-## Folder Structure
-
-Briefly describe the structure of the project's folders and files.
-
-NPC-Brain/
-├── frontend/
-│   ├── public/
-│   └── src/
-│       ├── Components/
-│       ├── App.js
-│       ├── App.css
-│       ├── index.js
-│       ├── 
-├── backend/
-│   ├── app.py
-│   └── models/
-│       ├── model1.py
-│       ├── model2.py
-│       └── model3.py
-├── ml_models/
-│   ├── model1/
-│   │   ├── data/
-│   │   ├── train.py
-│   │   └── predict.py
-│   ├── model2/
-│   │   ├── data/
-│   │   ├── train.py
-│   │   └── predict.py
-│   └── model3/
-│       ├── data/
-│       ├── train.py
-│       └── predict.py
-├── README.md
-└── ...
-
 ## Contact Us
 If you have any questions, suggestions, or would like to collaborate, feel free to reach out to us via email or through GitHub.
 
