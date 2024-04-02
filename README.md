@@ -22,10 +22,10 @@ This repository contains the code for an AI project aimed at creating emotionall
 
 ## Usage
 
-# To start backend server locally
+### To start backend server locally
 1. Run the python file app.py: `python3 backend/app.py`
 
-# To start frontend
+### To start frontend
 1. Navigate to the frontend directory: `cd frontend`
 2. Start the npm server: `npm start`
 
