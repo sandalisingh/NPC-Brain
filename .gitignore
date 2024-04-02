@@ -52,3 +52,4 @@ backend/models
 
 backend/config.yaml
 backend/flask_session
+*flask_session

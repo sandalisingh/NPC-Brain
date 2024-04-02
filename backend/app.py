@@ -108,11 +108,11 @@ def get_response():
             'action': action
         })
 
-        session['npc_brain'] = npc_brain
-        session.modified = True
+        # session['npc_brain'] = npc_brain
+        # session.modified = True
 
-            # print(f"Session ID: {session.sid}")
-            # print(f"Session: {session}")
+        # print(f"Session ID: {session.sid}")
+        # print(f"Session: {session}")
 
         return response, 200
         # else:

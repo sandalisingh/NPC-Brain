@@ -1,5 +1,5 @@
 import numpy as np
-from States import ActionStates, Range, PersonalityIndex, EmotionStates, get_action
+from States import ActionStates, Range, PersonalityIndex, EmotionStates
 from ActionGenerator import ActionGenerator
 
 # Instantiate ActionGenerator
@@ -15,7 +15,7 @@ while(True):
 
     # Call action_generator
     action_index = action_gen.generate_action(personality_vector, emotional_state_index, previous_action_state_index)
-    print("\n\n-> Generated Action : ", get_action(action_index))
+    print("\n\n-> Generated Action : ", ActionStates.index_to_enum(action_index))
     print("\n\n")
 
     # Call q_learning
