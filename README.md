@@ -32,4 +32,6 @@ This repository contains the code for an AI project aimed at creating emotionall
 ## Contact Us
 If you have any questions, suggestions, or would like to collaborate, feel free to reach out to us via email or through GitHub.
 
+Email - sandalisingh.02@gmail.com
+
 Thank you for your interest in our project!
