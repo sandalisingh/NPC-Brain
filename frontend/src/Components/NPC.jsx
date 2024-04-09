@@ -45,8 +45,11 @@ function NPC() {
                                         {messages[messages.length - 2].reply && (
                                             <br />
                                         )}
+                                        {messages[messages.length - 2].emotion && (
+                                            <span>(Emotional State : {messages[messages.length - 2].emotion})</span>
+                                        )}<br />
                                         {messages[messages.length - 2].action && (
-                                            <span>({messages[messages.length - 2].action})</span>
+                                            <span>[Action State : {messages[messages.length - 2].action}]</span>
                                         )}
                                     </p>
                                 )}
@@ -58,8 +61,11 @@ function NPC() {
                                                 <br />
                                             </>
                                         )}
+                                        {messages[messages.length - 1].emotion && (
+                                            <span>(Emotional State : {messages[messages.length - 1].emotion})</span>
+                                        )}<br />
                                         {messages[messages.length - 1].action && (
-                                            <span>({messages[messages.length - 1].action})</span>
+                                            <span>[Action State : {messages[messages.length - 1].action}]</span>
                                         )}
                                     </p>
                                 )}

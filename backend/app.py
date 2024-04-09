@@ -101,11 +101,13 @@ def get_response():
         reply = npc_brain.generate_reply(chat)
         emoji = str(npc_brain.get_emoji())
         action = str(npc_brain.get_current_action_state())
+        emotion = str(npc_brain.get_current_emotion_state())
 
         response = jsonify({
             'reply': reply, 
             'emoji': emoji,
-            'action': action
+            'action': action,
+            'emotion': emotion
         })
 
         # session['npc_brain'] = npc_brain
@@ -145,10 +147,12 @@ def get_states():
 
         emoji = str(npc_brain.get_emoji())
         action = str(npc_brain.get_current_action_state())
+        emotion = str(npc_brain.get_current_emotion_state())
 
         response = jsonify({
             'emoji': emoji,
-            'action': action
+            'action': action,
+            'emotion': emotion
         })
 
         # response.set_cookie('session', session.sid, secure=True, httponly=True, samesite='Strict')

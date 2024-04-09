@@ -3,9 +3,11 @@ from DialogueGenerator import DialogueGenerator
 import tensorflow as tf
 
 dialogue_generator = DialogueGenerator()
+dialogue_generator.reset_states()
 
-while(True) :
-    text = input("\n$ User : ")
-    emotion = input("$ Emotion : ")
-    response = dialogue_generator.generate_response_with_beam_search(text, emotion)
-    print("\n$ Response:", response)
+while(True) : 
+    dialogue_generator.reset_states()
+    text = input("\nUser : ")
+    emotion = input("Emotion : ")
+    response = dialogue_generator.generate_response_with_greedy_approach(text, emotion)
+    print("\n-> Response:", response)

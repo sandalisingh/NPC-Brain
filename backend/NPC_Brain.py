@@ -29,10 +29,10 @@ class NPC_Brain:
         prev_state = [prev_emotion_state, prev_action_state]
         self.ACTION_GENERATOR.q_learning(self.PERSONALITY_VECTOR, prev_state, self.ACTION_STATE)
 
-        reply = self.DIALOGUE_GENERATOR.generate_response_with_beam_search(chat_text, self.get_current_emotion_state())
+        reply = self.DIALOGUE_GENERATOR.generate_response_with_greedy_approach(chat_text, self.get_current_emotion_state())
 
         if reply == "":
-            reply = "I don't know."
+            reply = "Out of syllabus!"
 
         return reply
 

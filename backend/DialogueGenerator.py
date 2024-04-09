@@ -6,14 +6,18 @@ import pandas as pd
 from States import logging, EmotionStates
 from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model, Sequential, load_model
+from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import LambdaCallback
+from tensorflow.keras.optimizers.legacy import Adam
 from tensorflow.keras import backend
 from PositionalEncoding import PositionalEncoding
 from DataManager import DataManager
 from DataVisualizer import DataVisualizer
+from tensorflow.keras import regularizers
 from Tokenizer import Tokenizer
-from SequenceAnalyzer import SequenceAnalyzer
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+import string
 
 class DialogueGenerator:
 
@@ -24,7 +28,7 @@ class DialogueGenerator:
         self.VOCAB_SIZE = 10000   # Vocabulary size
         self.EMBEDDING_DIM = 300  # Embedding dimension
         self.HIDDEN_DIM = 512     # Hidden dimension for LSTM layers
-        self.MODEL_NAME = "backend/models/dialogue_generator_model.keras"
+        self.MODEL_NAME = "backend/dialogue_generator_model"
         self.MODEL = None
         self.TOKENIZER = Tokenizer(self.VOCAB_SIZE)
 
@@ -32,7 +36,7 @@ class DialogueGenerator:
 
     def load_model(self):
         try:
-            self.MODEL = load_model(self.MODEL_NAME)
+            self.MODEL = load_model(self.MODEL_NAME+".keras")
             logging("info", "Model loaded.")
         except Exception as e:
             logging("error", "Error loading model: "+str(e))
@@ -41,7 +45,7 @@ class DialogueGenerator:
     def save_model(self):
         if self.MODEL is not None:
             try:
-                self.MODEL.save(self.MODEL_NAME)
+                self.MODEL.save(os.path.join(os.getcwd(), self.MODEL_NAME+".keras"))
                 logging("info", "Model saved.")
             except Exception as e:
                 logging("error", "Error saving model: " + str(e))
@@ -56,50 +60,73 @@ class DialogueGenerator:
         
         positional_layer = PositionalEncoding(self.MAX_SEQ_LENGTH, self.EMBEDDING_DIM, name='positional_encoding_of_chat_text')
         positional_output = positional_layer(embedding_output)
+        # positional_output = Dropout(0.2)(positional_output)
         
         attention_output = MultiHeadAttention(num_heads=8, key_dim=self.EMBEDDING_DIM, value_dim=self.EMBEDDING_DIM, name='self_attention_to_chat_text')(positional_output, positional_output)
         residual_output = Add(name='residual_connection_of_chat_text')([positional_output, attention_output])
+        residual_output = Dropout(0.2, name='dropout_from_chat_text')(residual_output) 
         normalised_output = LayerNormalization(name='normalization_of_chat_text')(residual_output)
         _, hidden_state, cell_state = LSTM(self.HIDDEN_DIM, return_sequences=False, return_state=True, name='summarization_of_chat_text')(normalised_output)
 
         return chat_text, normalised_output, hidden_state, cell_state
 
     def define_decoder(self, processed_chat_text, summary_hidden_state, summary_cell_state):
-        # handle previous sequence
-        prev_seq = Input(shape=(self.MAX_SEQ_LENGTH,), name='prev_seq_input')
-        embedding_output = Embedding(self.VOCAB_SIZE, self.EMBEDDING_DIM, mask_zero=True, name='embedding_of_prev_seq')(prev_seq)
+        # Handle previous sequence
+        prev_seq = Input(shape=(self.MAX_SEQ_LENGTH,), name='prev_seq_input') # bs,50
+        embedding_output = Embedding(self.VOCAB_SIZE, self.EMBEDDING_DIM, mask_zero=True, name='embedding_of_prev_seq')(prev_seq) # bs,50,300
         
-        positional_layer = PositionalEncoding(self.MAX_SEQ_LENGTH, self.EMBEDDING_DIM, name='positional_encoding_of_prev_seq')
-        positional_output = positional_layer(embedding_output)
+        positional_layer = PositionalEncoding(self.MAX_SEQ_LENGTH, self.EMBEDDING_DIM, name='positional_encoding_of_prev_seq') # bs,50,300
+        positional_output = positional_layer(embedding_output) 
+        # positional_output = Dropout(0.2)(positional_output)
 
-        attention_output = Attention(name='self_attention_to_prev_seq')([positional_output, positional_output])
-        residual_of_prev_seq = Add(name='residual_connection_of_prev_seq')([positional_output, attention_output])
+        attention_output = Attention(name='self_attention_to_prev_seq')([positional_output, positional_output]) # bs,50,300
+        residual_of_prev_seq = Add(name='residual_connection_of_prev_seq')([positional_output, attention_output]) # bs,50,300
 
-        # handle emotion
-        emotion = Input(shape=(1,), name='emotion_input')
-        emotion_embedding = Embedding(len(list(EmotionStates)), self.EMBEDDING_DIM, name='embedding_of_emotion')(emotion)
-
-        # multiple lstm
+        # Multiple lstm
         _, lstm_chat_text_hidden_state, lstm_chat_text_cell_state = LSTM(self.HIDDEN_DIM, return_sequences=False, return_state=True, name='lstm_of_chat_text')(processed_chat_text, initial_state=[summary_hidden_state, summary_cell_state])
-        _, lstm_emotion_hidden_state, lstm_emotion_cell_state = LSTM(self.HIDDEN_DIM, return_sequences=False, return_state=True, name='lstm_of_emotion')(emotion_embedding, initial_state=[lstm_chat_text_hidden_state, lstm_chat_text_cell_state])
-        lstm_seq, _, lstm_state = LSTM(self.HIDDEN_DIM, return_sequences=True, return_state=True, name='lstm_of_prev_seq')(residual_of_prev_seq, initial_state=[lstm_emotion_hidden_state, lstm_emotion_cell_state])
+        lstm_seq = LSTM(self.HIDDEN_DIM, return_sequences=True, return_state=False, name='lstm_of_prev_seq')(residual_of_prev_seq, initial_state=[lstm_chat_text_hidden_state, lstm_chat_text_cell_state]) # bs,50,512
 
-        dense_of_seq = Dense(self.VOCAB_SIZE, name='dense_of_seq', activation='softmax')(lstm_seq)
-        dense_of_state = Dense(self.VOCAB_SIZE, name='dense_of_state', activation='softmax')(lstm_state)
+        # Handle emotion
+        emotion = Input(shape=(1,), name='emotion_input') # bs,1
+        emotion_repeat = RepeatVector(self.MAX_SEQ_LENGTH, name='emotion_repeat')(emotion) # bs,50,1
+        reshaped_emotion = Reshape((self.MAX_SEQ_LENGTH,), name='emotion_reshaped')(emotion_repeat) # bs,50
+        emotion_embedding = Embedding(len(EmotionStates), self.HIDDEN_DIM, name='emotion_embedding')(reshaped_emotion)  # bs,50,512
+        
+        # Apply attention with emotion and LSTM output
+        # context_vector = Attention(name='attention_to_emotion')([lstm_seq, emotion_embedding]) # bs,50,512
 
-        return emotion, prev_seq, dense_of_seq, dense_of_state
+        # Concatenate context vector with LSTM output
+        concatenated_output = Concatenate(name='seq_and_emotion')([lstm_seq, emotion_embedding]) # bs,50,1024
+        concatenated_output = Dropout(0.2, name='dropout_from_conc')(concatenated_output)
+        dense_of_seq = Dense(self.VOCAB_SIZE, name='dense_of_seq', activation='softmax')(concatenated_output)
+
+        return emotion, prev_seq, dense_of_seq
 
     def define_model(self):
         if self.MODEL is None:
             chat_text, processed_chat_text, summary_hidden_state, summary_cell_state = self.define_encoder()
-            emotion, prev_seq, dense_of_seq, dense_of_state = self.define_decoder(processed_chat_text, summary_hidden_state, summary_cell_state) 
-            self.MODEL = Model([chat_text, emotion, prev_seq], [dense_of_seq, dense_of_state])
-            # self.MODEL.name = self.MODEL_NAME
+            emotion, prev_seq, dense_of_seq = self.define_decoder(processed_chat_text, summary_hidden_state, summary_cell_state) 
+            self.MODEL = Model([chat_text, emotion, prev_seq], dense_of_seq)
+
+            # embedding_layer = self.MODEL.layers[1]  # Access the Embedding layer for L2 regularization
+            # embedding_layer.kernel_regularizer = regularizers.l2(0.01)  
+
+            # Emotion embedding with L2 regularization
+            # emotion_embedding_layer = self.MODEL.layers[-2]  # Access the emotion embedding layer
+            # emotion_embedding_layer.kernel_regularizer = regularizers.l2(0.01)
+
+            self.model_visualization()
             
             logging("info","Model defined.")
 
             self.save_model()
 
+    def reset_states(self):
+        if self.MODEL is None:
+            for layer in self.MODEL.layers:
+                if isinstance(layer, tf.keras.layers.LSTM):
+                    layer.reset_states()
+    
     #   INSPECTION
 
     def model_visualization(self):
@@ -121,7 +148,7 @@ class DialogueGenerator:
 
         DataVisualizer.display_top_rows(pd.DataFrame({"chat_text": chat_text, "emotion": emotion, "text_response": text_response}), 1, "Input")
 
-        chat_text, emotion, prev_seq, _, _ = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)   
+        chat_text, emotion, prev_seq, _ = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)   
 
         # Create a model to extract intermediate outputs
         intermediate_model = Model(inputs=self.MODEL.inputs, outputs=[layer.output for layer in self.MODEL.layers])
@@ -145,70 +172,93 @@ class DialogueGenerator:
 
     #   TRAINING
     
-    def test_model(self, chat_text, text_response, emotion):
+    def test_model(self, dataset_test_filename):
+        chat_text, text_response, emotion = DataManager.prepare_data(dataset_test_filename)
         # Preprocess data
-        chat_text_input, emotion_input, prev_seq, output_seq, output_state = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+        chat_text_input, emotion_input, prev_seq, output_seq = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
 
-        loss, dense_of_seq_loss, dense_of_state_loss, dense_of_seq_accuracy, dense_of_state_accuracy = self.MODEL.evaluate([chat_text_input, emotion_input, prev_seq], [output_seq, output_state])
-        logging("info", f"Model Tested.\n\tloss: {loss}\n\tdense_of_seq_loss: {dense_of_seq_loss}\n\tdense_of_state_loss: {dense_of_state_loss}\n\tdense_of_seq_accuracy: {dense_of_seq_accuracy}\n\tdense_of_state_accuracy: {dense_of_state_accuracy}")
+        self.reset_states()
 
-    def train_model(self, chat_text, text_response, emotion, epochs):
+        loss, accuracy = self.MODEL.evaluate([chat_text_input, emotion_input, prev_seq], output_seq)
+        logging("info", f"Model Tested: \t[Loss={loss}, Accuracy={accuracy}]")
+
+    def train_model(self, dataset_train_filename, dataset_valid_filename, epochs):
+        chat_text_train, text_response_train, emotion_train = DataManager.prepare_data(dataset_train_filename)
+        chat_text_valid, text_response_valid, emotion_valid = DataManager.prepare_data(dataset_valid_filename)
+        
         # Preprocess data
-        chat_text_input, emotion_input, prev_seq, output_seq, output_state = DataManager.preprocess_data(chat_text, text_response, emotion, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+        chat_text_train, emotion_train, prev_seq_train, output_seq_train = DataManager.preprocess_data(chat_text_train, text_response_train, emotion_train, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+        chat_text_valid, emotion_valid, prev_seq_valid, output_seq_valid = DataManager.preprocess_data(chat_text_valid, text_response_valid, emotion_valid, self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+
+        self.reset_states()
 
         # Train the model
-        self.MODEL.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        self.MODEL.compile(optimizer=Adam(learning_rate=0.001), loss='sparse_categorical_crossentropy', metrics=['accuracy']) 
         
         # Define validation split for evaluation during training
-        validation_split = 0.2  # 20% of training data for validation
+        # validation_split = 0.2  # 20% of training data for validation
+
+        # Define early stopping based on validation loss and validation accuracy
+        early_stopping_loss = EarlyStopping(monitor='val_loss', patience=5, mode='min', restore_best_weights=True)
 
         # Train the model with validation split
-        history = self.MODEL.fit([chat_text_input, emotion_input, prev_seq], [output_seq, output_state], batch_size=64, epochs=epochs, validation_split=validation_split)
+        history = self.MODEL.fit([chat_text_train, emotion_train, prev_seq_train], output_seq_train, batch_size=64, epochs=epochs, validation_data=([chat_text_valid, emotion_valid, prev_seq_valid], output_seq_valid), callbacks=[early_stopping_loss])
 
-        DataVisualizer.plot_train_history(history.history, 'dense_of_seq', 'Model Training')
-        DataVisualizer.plot_train_history(history.history, 'val_dense_of_seq', 'Model Validation')
-        DataVisualizer.plot_train_history(history.history, 'dense_of_state', 'Model Training')
-        DataVisualizer.plot_train_history(history.history, 'val_dense_of_state', 'Model Validation')
+        DataVisualizer.plot_train_history(history.history, 'loss', 'accuracy', 'Model_Training')
+        DataVisualizer.plot_train_history(history.history, 'val_loss', 'val_accuracy', 'Model_Validation')
 
         logging("info", "Model trained.")    
 
         self.save_model()
 
-    def train_and_test(self, dataset_filename, epochs=10, test_size=0.2, random_state=42):
-        chat_text, text_response, emotion = DataManager.prepare_data(dataset_filename)
-
-        chat_train, chat_test, response_train, response_test, emotion_train, emotion_test = train_test_split(chat_text, text_response, emotion, test_size=test_size, random_state=random_state)
-
-        self.train_model(chat_train, response_train, emotion_train, epochs)
-        self.test_model(chat_test, response_test, emotion_test)
+    def train_and_test(self, dataset_train_filename, dataset_valid_filename, dataset_test_filename, epochs=10, test_size=0.2, random_state=42):
+        self.train_model(dataset_train_filename, dataset_valid_filename, epochs)
+        self.test_model(dataset_test_filename)
 
         self.save_model()
 
     #   GENERTE RESPONSE
 
-    def sequence_to_text(self, prev_seq):
+    def sequence_to_text(self, seq):
+        seq = tf.reshape(seq[:,:,:], (-1,))
+        seq = seq[1:]
+
+        # Remove <OOV> and <start>
+        # seq = [x for x in seq if (x!=1 and x!=9998)]
+
         # Convert the sequence of token indices to text
-        response_tokens = [self.TOKENIZER.TOKENIZER.index_word.get(idx.numpy(), "") for idx in tf.reshape(prev_seq[:,:,1:], (-1,))]
-        response_tokens = [token for token in response_tokens if token!=""]
+        response_tokens = [self.TOKENIZER.TOKENIZER.index_word.get(idx.numpy(), "") for idx in seq]
+        # response_tokens = [token for token in response_tokens if token!=""]
 
         # Remove tokens after <end> token
         end_index = response_tokens.index('<end>') if '<end>' in response_tokens else len(response_tokens)
-        response_text = ' '.join(response_tokens[:end_index])
+        # response_text = ' '.join(response_tokens[:end_index])
+        response_text = ''
+        for i in range(end_index):
+            token = response_tokens[i]
+            if token in string.punctuation:
+                response_text += token
+            else:
+                response_text += ' ' + token
+        response_text = response_text.strip()
+        # response_text = ' '.join(response_tokens)
         return response_text
 
     def generate_response_with_greedy_approach(self, chat_text_str, emotion_str):
-        chat_text_input, emotion_input, prev_seq, _, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+        chat_text_input, emotion_input, prev_seq, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
         prev_seq = tf.tensor_scatter_nd_update(prev_seq, indices=[[0, 1]], updates=[0])
 
         # DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
 
         for i in range(1, self.MAX_SEQ_LENGTH):
             # Predict the next token
-            _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
-            
+            predicted_seq = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
+
             # Get the token index with the highest probability (greedy approach)
-            predicted_token_index = np.argmax(predicted_state[0, :])
-            # print("TOKEN = ", predicted_token_index)
+            predicted_token_index = np.argmax(predicted_seq[0, i-1, :])
+
+            if predicted_token_index==1 or predicted_token_index==0:    # skip <OOV>
+                continue
             
             # Update the previous sequence tensor
             updated_value = tf.constant(predicted_token_index, dtype=tf.int32)
@@ -226,7 +276,7 @@ class DialogueGenerator:
 
     def generate_response_with_beam_search(self, chat_text_str, emotion_str, beam_width=5):
         # Preprocess data 
-        chat_text_input, emotion_input, prev_seq, _, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
+        chat_text_input, emotion_input, prev_seq, _ = DataManager.preprocess_data([chat_text_str], [""], [emotion_str], self.VOCAB_SIZE, self.MAX_SEQ_LENGTH)
         prev_seq = tf.tensor_scatter_nd_update(prev_seq, indices=[[0, 1]], updates=[0])
 
         # DataVisualizer.print_tensor_dict("Input to model", {"chat_text": chat_text_input, "emotion": emotion_input, "prev_seq": prev_seq})
@@ -238,40 +288,29 @@ class DialogueGenerator:
         final_sequences_list = []
 
         # Main loop for generating sequences
-        for i in range(self.MAX_SEQ_LENGTH-1):
+        for i in range(1, self.MAX_SEQ_LENGTH):
             candidates_list = []
             completed_sequences_list = []
             for prev_seq, score in beam_list:
-
                 # Predict the next token probabilities
-                _, predicted_state = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
+                predicted_seq = self.MODEL.predict([chat_text_input, emotion_input, prev_seq], verbose=0)
 
                 # Get the top tokens with their probabilities
-                top_token_indices = np.argsort(predicted_state[0])[-beam_width:]
-                top_token_indices = top_token_indices[top_token_indices != 0]
+                top_token_indices = np.argsort(predicted_seq[0, i-1, :])[-beam_width:]
 
                 for token_index in top_token_indices:
                     # Create a candidate sequence
                     candidate_seq = np.copy(prev_seq)
 
-                    # Find the position where the next token should be inserted
-                    next_token_position = np.where(candidate_seq == 0)[1][0]
+                    # # Find the position where the next token should be inserted
+                    # next_token_position = np.where(candidate_seq == 0)[1][0]
 
-                    # Insert the token at the correct position
-                    candidate_seq[0, next_token_position] = token_index
+                    # # Insert the token at the correct position
+                    # candidate_seq[0, next_token_position] = token_index
 
-                    # # Calculate the score for the candidate sequence
-                    # candidate_score = score - np.log(predicted_state[0, token_index])       # negative likelyhood
+                    candidate_seq[0, i] = token_index
 
-                    # # Add penalty if the current token is equal to the previous token
-                    # if next_token_position > 0 and candidate_seq[0, next_token_position] == candidate_seq[0, next_token_position - 1]:
-                    #     penalty = -15  # You can adjust the penalty factor as needed
-                    #     candidate_score += penalty
-
-                    # # Normalize score by dividing by the length of the sequence raised to a power
-                    # length_factor = 0.7  # You can adjust this factor as needed
-                    # candidate_score /= len(candidate_seq[0])**length_factor
-                    candidate_score = score + SequenceAnalyzer.calculate_score(candidate_seq[0], chat_text_input[0].numpy(), i+2, predicted_state[0, token_index])
+                    candidate_score = self.calculate_score(candidate_seq[0], chat_text_input[0].numpy(), i, score)
 
                     # Check if the sequence is complete
                     if token_index == self.TOKENIZER.END_TOKEN:
@@ -296,3 +335,42 @@ class DialogueGenerator:
         response_text = self.sequence_to_text(np.array([best_seq]))
 
         return response_text
+
+    def calculate_score(self, gen_sequence, input_text, seq_len, prev_score, diversity_weight=0.4, length_penalty_weight=0.4, responsiveness_weight=0.2, trigram_penalty=0.6):
+        # Calculate diversity score
+        unique_tokens = len(set(gen_sequence))
+        n_grams = len(set(zip(*[gen_sequence[i:] for i in range(3)])))  # Consider trigrams for diversity
+        diversity_score = (unique_tokens + n_grams) / (seq_len+1)  # Normalize diversity score
+
+        # Calculate length penalty
+        if seq_len < 4:
+            length_penalty = seq_len / 4
+        elif seq_len > 10:
+            length_penalty = 10 / (seq_len*seq_len)
+        else:
+            length_penalty = 1
+        
+        # Calculate responsiveness
+        responsiveness = 0
+        input_tokens = set(input_text)
+        generated_tokens = set(gen_sequence)
+        common_tokens = len(input_tokens.intersection(generated_tokens))
+        responsiveness = common_tokens / max(len(input_tokens), 1)
+        
+        # Normalize scores
+        diversity_score = round(diversity_score, 4)
+        length_penalty = round(length_penalty, 4)
+        responsiveness = round(responsiveness, 4)
+        
+        final_score = (diversity_weight*diversity_score + length_penalty_weight*length_penalty + responsiveness_weight*responsiveness)
+        
+        # Ensure final score is between 0 and 1
+        final_score = max(0, min(final_score, 1))
+        
+        # Normalize score considering previous score
+        normalized_score = final_score + (prev_score - final_score) * 0.1
+        
+        # Round normalized score to 4 decimal places
+        normalized_score = round(normalized_score, 4)
+        
+        return normalized_score
