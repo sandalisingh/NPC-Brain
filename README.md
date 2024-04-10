@@ -21,10 +21,10 @@ The project utilizes machine learning techniques to imbue NPCs with the ability 
 
 ## Note
 Due to their large size, the following model files are not included in the repository but are required for full functionality:
-    - Action_Q_Table.npy  
-    - dialogue_generator_model.keras  
-    - emotion_classifier_model.joblib  
-    - tokenizer.pkl  
+- Action_Q_Table.npy  
+- dialogue_generator_model.keras  
+- emotion_classifier_model.joblib  
+- tokenizer.pkl  
 Please contact at the below mentioned email to obtain these files.
 
 ## Set up
@@ -37,38 +37,38 @@ Please contact at the below mentioned email to obtain these files.
 
 ## Project structure
 
-├── backend/  
-│   ├── models/  
-│   │   ├── Action_Q_Table.npy    
-│   │   ├── dialogue_generator_model.keras  
-│   │   ├── emotion_classifier_model.joblib  
-│   │   └── tokenizer.pkl  
-│   ├── ActionGenerator.py  
-│   ├── app.py  
-│   ├── config.yaml  
-│   ├── DataManager.py  
-│   ├── DataVisualizer.py  
-│   ├── DialogueGenerator.py  
-│   ├── EmotionClassifier.py  
-│   ├── EmotionGenerator.py  
-│   ├── NPC_Brain.py  
-│   ├── PositionalEncoding.py  
-│   ├── States.py  
-│   ├── Test_ActionGenerator.py  
-│   ├── Test_DialogueGenerator.py  
-│   ├── Test_EmotionClassifier.py  
-│   ├── Test_EmotionGenerator.py  
-│   ├── Test_NPC_Brain.py  
-│   └── Test_Tokenizer.py  
-└── frontend/  
-    ├── public/  
-    ├── src/  
-    │   ├── Components/  
-    │   ├── App.css  
-    │   ├── App.js  
-    │   └── index.js  
-    ├── package-lock.json  
-    └── package.json  
+ ├── backend/  
+ │     ├── models/  
+ │     │    ├── Action_Q_Table.npy    
+ │     │    ├── dialogue_generator_model.keras  
+ │     │    ├── emotion_classifier_model.joblib  
+ │     │    └── tokenizer.pkl  
+ │     ├── ActionGenerator.py  
+ │     ├── app.py  
+ │     ├── config.yaml  
+ │     ├── DataManager.py  
+ │     ├── DataVisualizer.py  
+ │     ├── DialogueGenerator.py  
+ │     ├── EmotionClassifier.py  
+ │     ├── EmotionGenerator.py  
+ │     ├── NPC_Brain.py  
+ │     ├── PositionalEncoding.py  
+ │     ├── States.py  
+ │     ├── Test_ActionGenerator.py  
+ │     ├── Test_DialogueGenerator.py  
+ │     ├── Test_EmotionClassifier.py  
+ │     ├── Test_EmotionGenerator.py  
+ │     ├── Test_NPC_Brain.py  
+ │     └── Test_Tokenizer.py  
+ └── frontend/  
+     ├── public/  
+     ├── src/  
+     │    ├── Components/  
+     │    ├── App.css  
+     │    ├── App.js  
+     │    └── index.js  
+     ├── package-lock.json  
+     └── package.json  
 
 ## Usage
 
