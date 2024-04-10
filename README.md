@@ -37,6 +37,7 @@ Please contact at the below mentioned email to obtain these files.
 
 ## Project structure
 
+```
  ├── backend/  
  │     ├── models/  
  │     │    ├── Action_Q_Table.npy    
@@ -69,6 +70,7 @@ Please contact at the below mentioned email to obtain these files.
      │    └── index.js  
      ├── package-lock.json  
      └── package.json  
+```
 
 ## Usage
 
