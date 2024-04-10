@@ -33,40 +33,40 @@ Please contact at the below mentioned email to obtain these files.
 2. Model Placement:
 - Place the required model files in the backend/models directory.
 
-## Project structure
+## Project Structure
 
-├── backend/
-│   ├── models/
-│   │   ├── Action_Q_Table.npy 
-│   │   ├── dialogue_generator_model.keras
-│   │   ├── emotion_classifier_model.joblib
-│   │   └── tokenizer.pkl
-│   ├── ActionGenerator.py
-│   ├── app.py
-│   ├── config.yaml
-│   ├── DataManager.py
-│   ├── DataVisualizer.py
-│   ├── DialogueGenerator.py
-│   ├── EmotionClassifier.py
-│   ├── EmotionGenerator.py
-│   ├── NPC_Brain.py
-│   ├── PositionalEncoding.py
-│   ├── States.py
-│   ├── Test_ActionGenerator.py
-│   ├── Test_DialogueGenerator.py
-│   ├── Test_EmotionClassifier.py
-│   ├── Test_EmotionGenerator.py
-│   ├── Test_NPC_Brain.py
-│   └── Test_Tokenizer.py
-└── frontend/
-    ├── public/
-    ├── src/
-    │   ├── Components/
-    │   ├── App.css
-    │   ├── App.js
-    │   └── index.js
-    ├── package-lock.json
-    └── package.json
+The project is organized into two primary directories: `backend` and `frontend`. Each directory houses essential components for the application's functionality.
+
+**backend**
+
+* **models** (directory): Contains pre-trained machine learning models utilized by the backend for various tasks. 
+  - **Action_Q_Table.npy** (file): (Replace with a brief description of the model's function)
+  - **dialogue_generator_model.keras** (file): (Replace with a brief description of the model's function)
+  - **emotion_classifier_model.joblib** (file): (Replace with a brief description of the model's function)
+  - **tokenizer.pkl** (file): (Replace with a brief description of the model's function)
+* **ActionGenerator.py** (file): Implements logic for generating actions.
+* **app.py** (file): Serves as the main entry point for the backend application.
+* **config.yaml** (file): Stores configuration settings for the backend.
+* **DataManager.py** (file): Handles data management tasks.
+* **DataVisualizer.py** (file): (Optional) Provides functionalities for data visualization.
+* **DialogueGenerator.py** (file): Generates dialogue text.
+* **EmotionClassifier.py** (file): Classifies emotions within the system.
+* **EmotionGenerator.py** (file): Generates emotional responses.
+* **NPC_Brain.py** (file): Core logic for the NPC's behavior.
+* **PositionalEncoding.py** (file): (Optional) Used for positional encoding in transformer models (if applicable).
+* **States.py** (file): Defines various states within the system.
+* **Test_*.py** (files): Dedicated files for testing individual models (e.g., Test_ActionGenerator.py).
+
+**frontend**
+
+* **public** (directory): Houses static assets used by the frontend application (if applicable).
+* **src** (directory): Contains the frontend source code.
+  * **Components** (directory): Reusable UI components for the frontend.
+  * **App.css** (file): Stylesheet for the frontend application.
+  * **App.js** (file): Main JavaScript file for the frontend application.
+  * **index.js** (file): Entry point for the frontend application.
+* **package-lock.json** (file): Locks down specific versions of frontend dependencies.
+* **package.json** (file): Manages dependencies required by the frontend application.
 
 ## Usage
 
