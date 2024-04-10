@@ -20,13 +20,16 @@ The project utilizes machine learning techniques to imbue NPCs with the ability 
 - TensorFlow: 2.15.0
 
 ## Note
-Due to their large size, the following model files are not included in the repository but are required for full functionality:  
-- Action_Q_Table.npy  
-- dialogue_generator_model.keras   
-- emotion_classifier_model.joblib  
-- tokenizer.pkl  
 
-Please contact at the below mentioned email to obtain these files.  
+Due to their large size, the following model files are not included in the repository but are required for full functionality:
+
+- Action_Q_Table.npy
+- dialogue_generator_model.keras
+- emotion_classifier_model.joblib
+- tokenizer.pkl
+
+Please contact at the below mentioned email to obtain these files.
+
 
 ## Set up
 
