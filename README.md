@@ -2,9 +2,7 @@
 
 ## Description
 
-This repository contains the code for an AI project aimed at creating emotionally intelligent non-player characters (NPCs) 
-for use in various applications such as gaming, virtual assistants, and more. 
-The project utilizes machine learning techniques to imbue NPCs with the ability to recognize and respond to emotions.
+This repository contains the code for an AI project aimed at creating emotionally intelligent non-player characters (NPCs) for use in various applications such as gaming, virtual assistants, and more. The project utilizes machine learning techniques to imbue NPCs with the ability to recognize and respond to emotions.
 
 ## Output screenshots
 
