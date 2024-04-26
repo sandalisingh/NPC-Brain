@@ -6,7 +6,7 @@ class Tokenizer():
 
     def __init__(self, vocab_size=10000):
         self.TOKENIZER = None
-        self.TOKENIZER_NAME = "backend/tokenizer.pkl"
+        self.TOKENIZER_NAME = "backend/models/tokenizer.pkl"
         self.VOCAB_SIZE = vocab_size
         self.START_TOKEN = 9998
         self.END_TOKEN = 9999
