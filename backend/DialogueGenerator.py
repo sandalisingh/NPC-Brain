@@ -8,6 +8,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.models import Model, Sequential, load_model
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.callbacks import LambdaCallback
+from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.optimizers.legacy import Adam
 from tensorflow.keras import backend
 from PositionalEncoding import PositionalEncoding
@@ -23,12 +24,12 @@ class DialogueGenerator:
 
     #   INITIALIZATION
 
-    def __init__(self):
+    def __init__(self, model_name="backend/models/dialogue_generator_model"):
         self.MAX_SEQ_LENGTH = 50  # Maximum sequence length for input and output
         self.VOCAB_SIZE = 10000   # Vocabulary size
         self.EMBEDDING_DIM = 300  # Embedding dimension
         self.HIDDEN_DIM = 512     # Hidden dimension for LSTM layers
-        self.MODEL_NAME = "backend/models/dialogue_generator_model"
+        self.MODEL_NAME = model_name
         self.MODEL = None
         self.TOKENIZER = Tokenizer(self.VOCAB_SIZE)
 
@@ -194,15 +195,24 @@ class DialogueGenerator:
 
         # Train the model
         self.MODEL.compile(optimizer=Adam(learning_rate=0.001), loss='sparse_categorical_crossentropy', metrics=['accuracy']) 
-        
-        # Define validation split for evaluation during training
-        # validation_split = 0.2  # 20% of training data for validation
 
         # Define early stopping based on validation loss and validation accuracy
         early_stopping_loss = EarlyStopping(monitor='val_loss', patience=5, mode='min', restore_best_weights=True)
 
+        # Create ModelCheckpoint callback with specific options
+        checkpoint_callback = ModelCheckpoint(
+            filepath=self.MODEL_NAME+"_checkpoint_{epoch:02d}"+".keras",
+            monitor='val_loss',  # Or 'val_accuracy' for maximizing accuracy
+            verbose=1,
+            save_best_only=True,
+            mode='min'
+        )
+
         # Train the model with validation split
-        history = self.MODEL.fit([chat_text_train, emotion_train, prev_seq_train], output_seq_train, batch_size=64, epochs=epochs, validation_data=([chat_text_valid, emotion_valid, prev_seq_valid], output_seq_valid), callbacks=[early_stopping_loss])
+        history = self.MODEL.fit([chat_text_train, emotion_train, prev_seq_train], output_seq_train, 
+                                    batch_size=64, epochs=epochs, shuffle=True,
+                                    validation_data=([chat_text_valid, emotion_valid, prev_seq_valid], output_seq_valid), 
+                                    callbacks=[early_stopping_loss, checkpoint_callback])
 
         DataVisualizer.plot_train_history(history.history, 'loss', 'accuracy', 'Model_Training')
         DataVisualizer.plot_train_history(history.history, 'val_loss', 'val_accuracy', 'Model_Validation')
@@ -211,7 +221,7 @@ class DialogueGenerator:
 
         self.save_model()
 
-    def train_and_test(self, dataset_train_filename, dataset_valid_filename, dataset_test_filename, epochs=10, test_size=0.2, random_state=42):
+    def train_and_test(self, dataset_train_filename, dataset_valid_filename, dataset_test_filename, epochs=10):
         self.train_model(dataset_train_filename, dataset_valid_filename, epochs)
         self.test_model(dataset_test_filename)
 

@@ -1,6 +1,7 @@
 from tensorflow.keras.models import Model
 from tensorflow.keras.utils import plot_model
 import matplotlib.pyplot as plt
+import graphviz
 from States import logging
 from prettytable import PrettyTable
 import tensorflow as tf
