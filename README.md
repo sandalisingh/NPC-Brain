@@ -7,7 +7,7 @@ This repository contains the code for an AI project aimed at creating emotionall
 ## Output screenshots
 
 ![WhatsApp Image 2024-04-09 at 23 16 36](https://github.com/sandalisingh/NPC-Brain/assets/77054645/e9b38a26-8055-49e9-9d27-6c0536ef9a62)
-![WhatsApp Image 2024-04-09 at 23 17 16](https://github.com/sandalisingh/NPC-Brain/assets/77054645/074932ca-69db-4668-b329-072973258dc9)
+<img src="https://github.com/user-attachments/assets/7ee63ea9-f1a6-4619-b313-5d903f2de7e5" alt="NPC-Brain" width="100%" style="object-fit:cover;"/> 
 
 ## Technologies Used
 
